@@ -1,15 +1,302 @@
-/* --- GAME SPECIFIC: REVERSI (OTHELLO) --- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clubhouse Tabletop Collection Deluxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        :root {
+            --wood-dark: #3E2723;
+            --wood-light: #5D4037;
+            --wood-grain: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(90)" opacity="0.2" version="1.1" xmlns="http://www.w3.org/2000/svg"><g><path fill="%23000000" d="M0 0h100v100H0z"/><path fill="%23ffffff" d="M0 0h100v3H0zM0 6h100v2H0zM0 12h100v4H0zM0 20h100v1H0zM0 26h100v3H0zM0 34h100v2H0zM0 40h100v4H0zM0 49h100v1H0zM0 54h100v3H0zM0 62h100v2H0zM0 68h100v4H0zM0 77h100v1H0zM0 82h100v3H0zM0 90h100v2H0zM0 96h100v4H0z"/></g></svg>');
+            --felt-green: #0a4a0e;
+            --felt-texture: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClD0ufAAAAElBMVEUAAADkbjDlbzHkcC/lbjHlbzI66UGEAAAABnRSTlMABR4wP095k1r4AAAASElEQVQ4y2NgIB64MTAw8QMr4QASzOlcwMrwH0gYqXEDK4s6kLIwH4i4gZXZuYGVeR8Q8QMrQz9Q2R0s4gZWRn0gYWRh3AAhAADv7A19k990agAAAABJRU5ErkJggg==');
+            --accent-gold: #d4af37;
+            --accent-brass: #b5a642;
+            --plastic-blue: #0277bd;
+            --plastic-red: #c62828;
+            --plastic-yellow: #fdd835;
+            --font-ui: 'Rubik', sans-serif;
+            --font-fancy: 'Cinzel Decorative', cursive;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--wood-dark);
+            background-image: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.6) 100%), var(--wood-grain);
+            background-size: cover, 200px 200px;
+            height: 100vh;
+            overflow: hidden;
+            color: #fffae0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* --- THE HUB (WOODEN SHELF) --- */
+        #game-hub {
+            width: 95%;
+            max-width: 1000px;
+            height: 85vh;
+            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.8),
+                0 20px 40px rgba(0,0,0,0.5),
+                0 0 0 10px var(--wood-dark);
+            border-bottom: 15px solid #2d1b18;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hub-header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: var(--font-fancy);
+            font-size: 3rem;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6), 0 0 20px rgba(212, 175, 55, 0.4);
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-gap: 25px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .game-grid::-webkit-scrollbar { width: 8px; background: rgba(0,0,0,0.3); border-radius: 4px;}
+        .game-grid::-webkit-scrollbar-thumb { background: var(--accent-brass); border-radius: 4px; border: 2px solid rgba(0,0,0,0.3); }
+
+        /* 3D Game Tiles */
+        .game-card {
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            color: var(--wood-dark);
+            border-radius: 12px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 5px 0 #9e9e9e, 0 15px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-out;
+            transform-style: preserve-3d;
+            border: 2px solid #fff;
+        }
+
+        .game-card:hover { transform: translateY(-8px); box-shadow: 0 13px 0 #9e9e9e, 0 25px 30px rgba(0,0,0,0.4); }
+        .game-card:active { transform: translateY(2px); box-shadow: 0 3px 0 #9e9e9e, 0 10px 15px rgba(0,0,0,0.4); }
+
+        .game-card.disabled {
+            filter: grayscale(90%) contrast(80%);
+            opacity: 0.7;
+            cursor: not-allowed;
+            box-shadow: none;
+            background: #ccc;
+            transform: none !important;
+        }
+
+        .game-icon-wrapper {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2));
+        }
+        
+        .game-title { font-weight: 800; font-size: 1.1rem; text-align: center; color: #333; }
+        .game-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-brass);
+            background: var(--wood-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* --- ACTIVE GAME CONTAINER (FELT TABLE) --- */
+        #active-game-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--felt-green);
+            background-image: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 90%), var(--felt-texture);
+            transform: translateY(120%) rotateX(20deg);
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            z-index: 20;
+        }
+
+        #active-game-container.visible { transform: translateY(0) rotateX(0deg); opacity: 1; }
+
+        .game-navbar {
+            padding: 15px 30px;
+            background: linear-gradient(to bottom, var(--accent-brass), #8c7f32);
+            border-bottom: 4px solid #6b6026;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--wood-dark);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        #current-game-title { font-family: var(--font-fancy); font-weight: 700; font-size: 1.5rem; }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+            color: var(--accent-gold);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2d1b18, 0 8px 10px rgba(0,0,0,0.3);
+            transition: all 0.1s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid var(--wood-light);
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 5px 0 #2d1b18, 0 10px 15px rgba(0,0,0,0.3);}
+        .btn:active { transform: translateY(4px); box-shadow: 0 0px 0 #2d1b18, inset 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .game-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+            padding: 20px;
+        }
+
+        .status-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.6);
+            color: var(--accent-gold);
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: 3px solid var(--accent-brass);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 5px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,1);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        /* --- CONNECT FOUR STYLES --- */
+        .c4-board-frame {
+            background: linear-gradient(to right, #01579b, var(--plastic-blue), #01579b);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 0 #004c8c, 0 30px 40px rgba(0,0,0,0.5), inset 0 -5px 15px rgba(0,0,0,0.3);
+            border: 2px solid #0288d1;
+            position: relative;
+        }
+        .c4-board-frame::after {
+            content: ''; position: absolute; bottom: -25px; left: 5%; width: 90%; height: 25px;
+            background: linear-gradient(to bottom, #004c8c, var(--wood-dark));
+            z-index: -1;
+            border-radius: 0 0 10px 10px;
+        }
+        .c4-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 60px);
+            grid-gap: 10px;
+            background-color: rgba(0,0,0,0.3); 
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);
+        }
+        .c4-cell-mask {
+            width: 60px; height: 60px;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.2);
+            border: 4px solid var(--plastic-blue);
+        }
+        .c4-piece {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            position: absolute; top: 0; left: 0;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5), inset 5px 5px 15px rgba(255,255,255,0.4), 0 5px 10px rgba(0,0,0,0.3);
+        }
+        .c4-piece.red { background: radial-gradient(circle at 30% 30%, #ff8a80, var(--plastic-red)); border: 2px solid #b71c1c; }
+        .c4-piece.yellow { background: radial-gradient(circle at 30% 30%, #ffff8d, var(--plastic-yellow)); border: 2px solid #f57f17;}
+        .c4-piece.dropping { animation: dropIn 0.5s cubic-bezier(0.5, 0.05, 1, 0.5) forwards; }
+        @keyframes dropIn { from { transform: translateY(-400px); } to { transform: translateY(0); } }
+
+        /* --- TIC TAC TOE STYLES --- */
+        .ttt-board {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-gap: 15px;
+            background-color: var(--accent-brass);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.4);
+            border: 3px solid #8c7f32;
+        }
+        .ttt-cell {
+            width: 110px; height: 110px;
+            background-color: var(--felt-green);
+            background-image: var(--felt-texture);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            font-family: var(--font-fancy);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .ttt-cell:hover { background-color: #0d5c12; box-shadow: inset 0 0 25px rgba(0,0,0,0.7); }
+        .ttt-piece {
+            color: transparent;
+            background: linear-gradient(to bottom, #dcedc8, #aed581);
+            background-clip: text;
+            -webkit-background-clip: text;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
+            transform: scale(0);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .ttt-piece.o { background: linear-gradient(to bottom, #ffccbc, #ffab91); background-clip: text; -webkit-background-clip: text; }
+        @keyframes popIn { to { transform: scale(1); } }
+
+        /* --- REVERSI (OTHELLO) STYLES --- */
         .reversi-board {
             display: grid;
             grid-template-columns: repeat(8, 50px);
             grid-gap: 4px;
-            background-color: #333; /* Dark borders */
+            background-color: #333;
             padding: 8px;
             border-radius: 5px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
             border: 4px solid #444;
         }
-
         .reversi-cell {
             width: 50px; height: 50px;
             background-color: var(--felt-green);
@@ -19,17 +306,14 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            perspective: 600px; /* Essential for 3D flip */
+            perspective: 600px;
         }
-        
         .reversi-cell.legal-move::after {
-            content: '';
-            width: 15px; height: 15px;
+            content: ''; width: 15px; height: 15px;
             background: rgba(0,0,0,0.2);
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.1);
         }
-
         .reversi-chip {
             width: 40px; height: 40px;
             position: relative;
@@ -37,8 +321,6 @@
             transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
             border-radius: 50%;
         }
-
-        /* 3D Sides of the chip */
         .chip-face {
             position: absolute;
             width: 100%; height: 100%;
@@ -47,16 +329,458 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             border: 1px solid rgba(0,0,0,0.2);
         }
-
-        .chip-front {
-            background: radial-gradient(circle at 30% 30%, #444, #000); /* Black */
-        }
-
-        .chip-back {
-            background: radial-gradient(circle at 30% 30%, #fff, #ddd); /* White */
-            transform: rotateY(180deg);
-        }
-
-        /* State Classes */
+        .chip-front { background: radial-gradient(circle at 30% 30%, #444, #000); }
+        .chip-back { background: radial-gradient(circle at 30% 30%, #fff, #ddd); transform: rotateY(180deg); }
         .reversi-chip.black { transform: rotateY(0deg); }
         .reversi-chip.white { transform: rotateY(180deg); }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-hub">
+        <div class="hub-header">Clubhouse Collection</div>
+        <div class="game-grid" id="game-grid">
+            </div>
+    </div>
+
+    <div id="active-game-container">
+        <div class="game-navbar">
+            <button class="btn" onclick="app.returnToHub()">← Collection</button>
+            <h2 id="current-game-title">Game Title</h2>
+            <button class="btn" onclick="app.resetCurrentGame()">Restart</button>
+        </div>
+        <div class="game-area">
+            <div class="status-display" id="game-status">Player's Turn</div>
+            <div id="game-board-container"></div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * CLUBHOUSE ARCHITECT ENGINE
+         * Visual Deluxe Edition with 3 Active Games
+         */
+
+        // --- GAME BASE CLASS ---
+        class BoardGame {
+            constructor(container, statusElement) {
+                this.container = container;
+                this.statusEl = statusElement;
+                this.isPlayerTurn = true;
+                this.gameOver = false;
+                this.init();
+            }
+            updateStatus(msg) { this.statusEl.innerText = msg; }
+            aiDelay(callback) { setTimeout(callback, 1000); }
+        }
+
+        // --- TIC TAC TOE (Unbeatable Minimax) ---
+        class TicTacToe extends BoardGame {
+            init() {
+                this.board = Array(9).fill(null);
+                this.isPlayerTurn = true; // Player is X
+                this.gameOver = false;
+                this.render();
+                this.updateStatus("Your Turn (X)");
+            }
+            render() {
+                this.container.innerHTML = '<div class="ttt-board"></div>';
+                const boardEl = this.container.querySelector('.ttt-board');
+                this.board.forEach((cell, idx) => {
+                    const cellEl = document.createElement('div');
+                    cellEl.className = `ttt-cell`;
+                    if(cell) cellEl.innerHTML = `<span class="ttt-piece ${cell.toLowerCase()}">${cell}</span>`;
+                    cellEl.onclick = () => this.handleMove(idx);
+                    boardEl.appendChild(cellEl);
+                });
+            }
+            handleMove(idx) {
+                if (this.board[idx] || !this.isPlayerTurn || this.gameOver) return;
+                this.board[idx] = 'X';
+                this.render();
+                if (this.checkWin('X')) { this.gameOver = true; this.updateStatus("You Win!"); return; }
+                if (!this.board.includes(null)) { this.gameOver = true; this.updateStatus("Draw!"); return; }
+                this.isPlayerTurn = false;
+                this.updateStatus("AI Thinking...");
+                this.aiDelay(() => this.makeAIMove());
+            }
+            makeAIMove() {
+                if (this.gameOver) return;
+                let bestScore = -Infinity, move;
+                for (let i = 0; i < 9; i++) {
+                    if (this.board[i] === null) {
+                        this.board[i] = 'O';
+                        let score = this.minimax(this.board, 0, false);
+                        this.board[i] = null;
+                        if (score > bestScore) { bestScore = score; move = i; }
+                    }
+                }
+                this.board[move] = 'O';
+                this.render();
+                if (this.checkWin('O')) { this.gameOver = true; this.updateStatus("AI Wins!"); } 
+                else if (!this.board.includes(null)) { this.gameOver = true; this.updateStatus("Draw!"); } 
+                else { this.isPlayerTurn = true; this.updateStatus("Your Turn (X)"); }
+            }
+            checkWin(player) {
+                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                return wins.some(c => this.board[c[0]] === player && this.board[c[1]] === player && this.board[c[2]] === player);
+            }
+            minimax(board, depth, isMaximizing) {
+                if (this.checkWin('O')) return 10 - depth;
+                if (this.checkWin('X')) return depth - 10;
+                if (!board.includes(null)) return 0;
+                if (isMaximizing) {
+                    let bestScore = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === null) {
+                            board[i] = 'O';
+                            bestScore = Math.max(bestScore, this.minimax(board, depth + 1, false));
+                            board[i] = null;
+                        }
+                    }
+                    return bestScore;
+                } else {
+                    let bestScore = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (board[i] === null) {
+                            board[i] = 'X';
+                            bestScore = Math.min(bestScore, this.minimax(board, depth + 1, true));
+                            board[i] = null;
+                        }
+                    }
+                    return bestScore;
+                }
+            }
+        }
+
+        // --- CONNECT FOUR (Block/Win Heuristic) ---
+        class ConnectFour extends BoardGame {
+            init() {
+                this.rows = 6;
+                this.cols = 7;
+                this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(null));
+                this.isPlayerTurn = true;
+                this.gameOver = false;
+                this.renderBoardStructure();
+                this.updateStatus("Your Turn (Red)");
+            }
+            renderBoardStructure() {
+                this.container.innerHTML = `<div class="c4-board-frame"><div class="c4-grid" id="c4-grid-slots"></div></div>`;
+                this.gridEl = document.getElementById('c4-grid-slots');
+                this.renderCells();
+            }
+            renderCells(lastMoveCoords = null) {
+                this.gridEl.innerHTML = '';
+                for (let r = 0; r < this.rows; r++) {
+                    for (let c = 0; c < this.cols; c++) {
+                        const cellMask = document.createElement('div');
+                        cellMask.className = 'c4-cell-mask';
+                        cellMask.onclick = () => this.handleMove(c);
+                        const color = this.board[r][c];
+                        if (color) {
+                            const piece = document.createElement('div');
+                            const isLastMove = lastMoveCoords && lastMoveCoords.r === r && lastMoveCoords.c === c;
+                            piece.className = `c4-piece ${color} ${isLastMove ? 'dropping' : ''}`;
+                            cellMask.appendChild(piece);
+                        }
+                        this.gridEl.appendChild(cellMask);
+                    }
+                }
+            }
+            handleMove(col) {
+                if (!this.isPlayerTurn || this.gameOver) return;
+                let row = -1;
+                for (let r = this.rows - 1; r >= 0; r--) { if (!this.board[r][col]) { row = r; break; } }
+                if (row === -1) return; 
+                this.dropPiece(row, col, 'red');
+                if (this.checkWin(row, col, 'red')) { this.gameOver = true; this.updateStatus("Red Wins!"); return; }
+                this.isPlayerTurn = false;
+                this.updateStatus("AI Thinking...");
+                this.aiDelay(() => this.makeAIMove());
+            }
+            dropPiece(r, c, color) {
+                this.board[r][c] = color;
+                this.renderCells({r, c}); 
+            }
+            makeAIMove() {
+                if (this.gameOver) return;
+                let move = this.findBestMove('yellow') || this.findBestMove('red') || this.getRandomMove();
+                if (move !== null) {
+                    let r = -1;
+                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][move]) { r = i; break; } }
+                    this.dropPiece(r, move, 'yellow');
+                    if (this.checkWin(r, move, 'yellow')) { this.gameOver = true; this.updateStatus("AI (Yellow) Wins!"); } 
+                    else { this.isPlayerTurn = true; this.updateStatus("Your Turn (Red)"); }
+                }
+            }
+            findBestMove(color) {
+                for (let c = 0; c < this.cols; c++) {
+                    if (this.board[0][c]) continue;
+                    let r = -1;
+                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][c]) { r = i; break; } }
+                    this.board[r][c] = color;
+                    let win = this.checkWin(r, c, color);
+                    this.board[r][c] = null;
+                    if (win) return c;
+                }
+                return null;
+            }
+            getRandomMove() {
+                let validCols = [];
+                for(let c=0; c<this.cols; c++) if(!this.board[0][c]) validCols.push(c);
+                return validCols[Math.floor(Math.random() * validCols.length)];
+            }
+            checkWin(r, c, color) {
+                const directions = [[0, 1],[1, 0],[1, 1],[1, -1]];
+                return directions.some(([dr, dc]) => {
+                    let count = 1;
+                    for (let i = 1; i < 4; i++) {
+                        const nr = r + dr * i, nc = c + dc * i;
+                        if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && this.board[nr][nc] === color) count++; else break;
+                    }
+                    for (let i = 1; i < 4; i++) {
+                        const nr = r - dr * i, nc = c - dc * i;
+                        if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && this.board[nr][nc] === color) count++; else break;
+                    }
+                    return count >= 4;
+                });
+            }
+        }
+
+        // --- REVERSI / OTHELLO (Positional Heuristic + 3D Flips) ---
+        class Reversi extends BoardGame {
+            init() {
+                this.rows = 8; this.cols = 8;
+                this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+                this.board[3][3] = 2; this.board[3][4] = 1;
+                this.board[4][3] = 1; this.board[4][4] = 2;
+                this.isPlayerTurn = true;
+                this.gameOver = false;
+                this.renderBoardStructure();
+                this.updateLegalMoves();
+                this.updateStatus("Your Turn (Black)");
+            }
+            renderBoardStructure() {
+                this.container.innerHTML = '<div class="reversi-board"></div>';
+                const boardEl = this.container.querySelector('.reversi-board');
+                this.cells = [];
+                for(let r=0; r<this.rows; r++){
+                    for(let c=0; c<this.cols; c++){
+                        const cell = document.createElement('div');
+                        cell.className = 'reversi-cell';
+                        cell.onclick = () => this.handleMove(r, c);
+                        const chip = document.createElement('div');
+                        chip.className = 'reversi-chip';
+                        chip.innerHTML = `<div class="chip-face chip-front"></div><div class="chip-face chip-back"></div>`;
+                        if(this.board[r][c] === 0) chip.style.display = 'none';
+                        else chip.classList.add(this.board[r][c] === 1 ? 'black' : 'white');
+                        cell.appendChild(chip);
+                        boardEl.appendChild(cell);
+                        this.cells.push({ el: cell, chip: chip, r: r, c: c });
+                    }
+                }
+            }
+            renderUpdates() {
+                this.cells.forEach(obj => {
+                    const val = this.board[obj.r][obj.c];
+                    if(val === 0) {
+                        obj.chip.style.display = 'none';
+                        obj.chip.className = 'reversi-chip';
+                    } else {
+                        obj.chip.style.display = 'block';
+                        if(obj.chip.style.display === 'none') void obj.chip.offsetWidth; 
+                        const targetClass = val === 1 ? 'black' : 'white';
+                        if(!obj.chip.classList.contains(targetClass)) {
+                            obj.chip.classList.remove('black', 'white');
+                            obj.chip.classList.add(targetClass);
+                        }
+                    }
+                    if(this.isPlayerTurn && this.legalMoves.some(m => m.r === obj.r && m.c === obj.c)) {
+                        obj.el.classList.add('legal-move');
+                    } else {
+                        obj.el.classList.remove('legal-move');
+                    }
+                });
+                this.updateScore();
+            }
+            updateScore() {
+                let black = 0, white = 0;
+                this.board.forEach(r => r.forEach(c => { if(c===1) black++; else if(c===2) white++; }));
+                if(!this.gameOver) this.updateStatus(this.isPlayerTurn ? `Your Turn (B: ${black} - W: ${white})` : `AI Thinking (B: ${black} - W: ${white})`);
+                return {black, white};
+            }
+            getFlips(r, c, player) {
+                const opponent = player === 1 ? 2 : 1;
+                const directions = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]];
+                let flips = [];
+                directions.forEach(([dr, dc]) => {
+                    let rCurr = r + dr, cCurr = c + dc;
+                    let potentialFlips = [];
+                    while(rCurr >= 0 && rCurr < 8 && cCurr >= 0 && cCurr < 8) {
+                        if(this.board[rCurr][cCurr] === opponent) potentialFlips.push({r: rCurr, c: cCurr});
+                        else if(this.board[rCurr][cCurr] === player) { flips.push(...potentialFlips); break; } 
+                        else break;
+                        rCurr += dr; cCurr += dc;
+                    }
+                });
+                return flips;
+            }
+            updateLegalMoves() {
+                const player = this.isPlayerTurn ? 1 : 2;
+                this.legalMoves = [];
+                for(let r=0; r<8; r++){
+                    for(let c=0; c<8; c++){
+                        if(this.board[r][c] !== 0) continue;
+                        const flips = this.getFlips(r, c, player);
+                        if(flips.length > 0) this.legalMoves.push({r, c, flips});
+                    }
+                }
+                this.renderUpdates();
+                if(this.legalMoves.length === 0 && !this.gameOver) {
+                     if(!this.checkGameEnd(player)) {
+                         this.isPlayerTurn = !this.isPlayerTurn;
+                         setTimeout(() => {
+                             this.updateStatus(this.isPlayerTurn ? "Pass! Your Turn" : "Pass! AI Turn");
+                             this.updateLegalMoves();
+                             if(!this.isPlayerTurn) this.aiDelay(() => this.makeAIMove());
+                         }, 1500);
+                     }
+                }
+            }
+            checkGameEnd() {
+                const blackMoves = this.hasMoves(1);
+                const whiteMoves = this.hasMoves(2);
+                if(!blackMoves && !whiteMoves) {
+                    this.gameOver = true;
+                    const {black, white} = this.updateScore();
+                    if(black > white) this.updateStatus(`You Win! (${black}-${white})`);
+                    else if(white > black) this.updateStatus(`AI Wins! (${white}-${black})`);
+                    else this.updateStatus("Draw!");
+                    return true;
+                }
+                return false;
+            }
+            hasMoves(player) {
+                for(let r=0; r<8; r++) { for(let c=0; c<8; c++) { if(this.board[r][c] === 0 && this.getFlips(r, c, player).length > 0) return true; } }
+                return false;
+            }
+            handleMove(r, c) {
+                if(!this.isPlayerTurn || this.gameOver) return;
+                const move = this.legalMoves.find(m => m.r === r && m.c === c);
+                if(!move) return;
+                this.executeMove(move, 1);
+            }
+            executeMove(move, player) {
+                this.board[move.r][move.c] = player;
+                move.flips.forEach(f => { this.board[f.r][f.c] = player; });
+                this.isPlayerTurn = !this.isPlayerTurn;
+                this.renderUpdates();
+                if(!this.checkGameEnd()) {
+                    if(!this.isPlayerTurn) {
+                        this.updateLegalMoves();
+                        this.aiDelay(() => this.makeAIMove());
+                    } else this.updateLegalMoves();
+                }
+            }
+            makeAIMove() {
+                if(this.gameOver) return;
+                const weights = [
+                    [100, -10, 10, 10, 10, 10, -10, 100],
+                    [-10, -20,  1,  1,  1,  1, -20, -10],
+                    [ 10,   1,  5,  5,  5,  5,   1,  10],
+                    [ 10,   1,  5,  5,  5,  5,   1,  10],
+                    [ 10,   1,  5,  5,  5,  5,   1,  10],
+                    [ 10,   1,  5,  5,  5,  5,   1,  10],
+                    [-10, -20,  1,  1,  1,  1, -20, -10],
+                    [100, -10, 10, 10, 10, 10, -10, 100]
+                ];
+                let bestScore = -Infinity;
+                let bestMove = null;
+                if(this.legalMoves.length === 0) return;
+                this.legalMoves.forEach(move => {
+                    let score = weights[move.r][move.c] + (move.flips.length * 2);
+                    if(score > bestScore) { bestScore = score; bestMove = move; }
+                });
+                if(bestMove) this.executeMove(bestMove, 2);
+            }
+        }
+
+        // --- CORE ENGINE ---
+        class GameEngine {
+            constructor() {
+                this.games = [
+                    { id: 'c4', name: 'Connect Four', icon: '🔴', active: true, class: ConnectFour },
+                    { id: 'ttt', name: 'Tic Tac Toe', icon: '❌', active: true, class: TicTacToe },
+                    { id: 'othello', name: 'Reversi', icon: '⚫', active: true, class: Reversi },
+                    { id: 'chess', name: 'Chess', icon: '♟️', active: false },
+                    { id: 'checkers', name: 'Checkers', icon: '⚪', active: false },
+                    { id: 'mancala', name: 'Mancala', icon: '💎', active: false },
+                    { id: 'dots', name: 'Dots & Boxes', icon: '⬛', active: false },
+                    { id: 'battleship', name: 'Sea Battle', icon: '🚢', active: false },
+                    { id: 'memory', name: 'Memory', icon: '🃏', active: false },
+                    { id: 'backgammon', name: 'Backgammon', icon: '🎲', active: false },
+                    { id: 'ludo', name: 'Ludo', icon: '🎲', active: false },
+                    { id: 'gomoku', name: 'Gomoku', icon: '⚪', active: false }
+                ];
+                this.currentGame = null;
+                this.initHub();
+            }
+
+            initHub() {
+                const grid = document.getElementById('game-grid');
+                this.games.forEach(game => {
+                    const card = document.createElement('div');
+                    card.className = `game-card ${game.active ? '' : 'disabled'}`;
+                    card.innerHTML = `
+                        <span class="game-icon-wrapper">${game.icon}</span>
+                        <div class="game-title">${game.name}</div>
+                        <div class="game-status">${game.active ? 'Play vs AI' : 'On Shelf'}</div>
+                    `;
+                    card.onclick = () => { if (game.active) this.launchGame(game); };
+                    grid.appendChild(card);
+                });
+            }
+
+            launchGame(gameMeta) {
+                const hub = document.getElementById('game-hub');
+                hub.style.transform = 'perspective(1000px) rotateX(15deg) scale(0.9) translateY(50px)';
+                hub.style.opacity = '0';
+                
+                setTimeout(() => {
+                    hub.style.display = 'none';
+                    const container = document.getElementById('active-game-container');
+                    container.classList.add('visible');
+                    document.getElementById('current-game-title').innerText = gameMeta.name;
+                    this.currentGame = new gameMeta.class(
+                        document.getElementById('game-board-container'),
+                        document.getElementById('game-status')
+                    );
+                }, 500);
+            }
+
+            returnToHub() {
+                const container = document.getElementById('active-game-container');
+                container.classList.remove('visible');
+                setTimeout(() => {
+                    const hub = document.getElementById('game-hub');
+                    hub.style.display = 'flex';
+                    void hub.offsetWidth;
+                    hub.style.transform = 'none';
+                    hub.style.opacity = '1';
+                    this.currentGame = null;
+                    document.getElementById('game-board-container').innerHTML = '';
+                }, 600);
+            }
+
+            resetCurrentGame() {
+                if (this.currentGame) this.currentGame.init();
+            }
+        }
+
+        // --- START ---
+        const app = new GameEngine();
+
+    </script>
+</body>
+</html>
