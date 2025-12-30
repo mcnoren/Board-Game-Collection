@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clubhouse Tabletop Deluxe v3</title>
+    <title>Clubhouse Deluxe v4</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE VISUALS --- */
@@ -16,8 +16,9 @@
             --accent-gold: #d4af37;
             --accent-brass: #b5a642;
             --plastic-blue: #0277bd;
-            --plastic-red: #c62828;
-            --plastic-yellow: #fdd835;
+            --plastic-blue-dark: #004c8c;
+            --plastic-red: #d32f2f;
+            --plastic-yellow: #fbc02d;
             --font-ui: 'Rubik', sans-serif;
             --font-fancy: 'Cinzel Decorative', cursive;
         }
@@ -38,37 +39,26 @@
             perspective: 1000px;
         }
 
-        /* --- MODE SELECTION MODAL --- */
+        /* --- MODALS & MENUS --- */
         #mode-modal {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 50; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         #mode-modal.active { opacity: 1; pointer-events: all; }
         
         .mode-card {
             background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
-            padding: 40px;
-            border-radius: 15px;
-            border: 4px solid var(--accent-brass);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 40px; border-radius: 15px; border: 4px solid var(--accent-brass);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); text-align: center;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #mode-modal.active .mode-card { transform: scale(1); }
-        
         .mode-title { font-family: var(--font-fancy); font-size: 2rem; color: var(--accent-gold); margin-bottom: 20px; }
         .mode-btn-group { display: flex; gap: 20px; }
         
-        /* --- HUB & LAYOUT --- */
+        /* --- HUB --- */
         #game-hub {
             width: 95%; max-width: 1000px; height: 85vh;
             background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
@@ -79,29 +69,15 @@
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s;
             position: relative; z-index: 10;
         }
-
-        .hub-header {
-            text-align: center; margin-bottom: 30px;
-            font-family: var(--font-fancy); font-size: 3rem; color: var(--accent-gold);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .game-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-gap: 25px;
-            overflow-y: auto; padding: 20px;
-            background: rgba(0,0,0,0.2); border-radius: 8px;
-            box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
-        }
+        .hub-header { text-align: center; margin-bottom: 30px; font-family: var(--font-fancy); font-size: 3rem; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.6); }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-gap: 25px; overflow-y: auto; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 8px; box-shadow: inset 0 5px 20px rgba(0,0,0,0.5); }
         .game-grid::-webkit-scrollbar { width: 8px; background: rgba(0,0,0,0.3); }
         .game-grid::-webkit-scrollbar-thumb { background: var(--accent-brass); border-radius: 4px; }
 
         .game-card {
-            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
-            color: var(--wood-dark);
-            border-radius: 12px; height: 160px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; position: relative;
-            box-shadow: 0 5px 0 #9e9e9e, 0 15px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); color: var(--wood-dark);
+            border-radius: 12px; height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; box-shadow: 0 5px 0 #9e9e9e, 0 15px 20px rgba(0,0,0,0.3);
             transition: all 0.2s ease-out; transform-style: preserve-3d; border: 2px solid #fff;
         }
         .game-card:hover { transform: translateY(-8px); box-shadow: 0 13px 0 #9e9e9e, 0 25px 30px rgba(0,0,0,0.4); }
@@ -128,7 +104,6 @@
             display: flex; justify-content: space-between; align-items: center; color: var(--wood-dark);
         }
         #current-game-title { font-family: var(--font-fancy); font-weight: 700; font-size: 1.5rem; }
-
         .btn {
             padding: 12px 24px; border: none; background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
             color: var(--accent-gold); font-family: var(--font-ui); font-weight: 700; border-radius: 8px;
@@ -144,38 +119,87 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-align: center; min-width: 300px;
         }
 
-        /* --- CONNECT 4: BOUNCE PHYSICS --- */
-        .c4-board-frame {
-            background: linear-gradient(to right, #01579b, var(--plastic-blue), #01579b);
-            padding: 20px; border-radius: 15px; border: 2px solid #0288d1; position: relative;
-            box-shadow: 0 15px 0 #004c8c, 0 30px 40px rgba(0,0,0,0.5);
+        /* --- 1. CONNECT FOUR: LAYERED ANIMATION --- */
+        .c4-frame {
+            position: relative;
+            padding: 15px;
+            background: var(--plastic-blue-dark);
+            border-radius: 10px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
         }
-        .c4-grid { display: grid; grid-template-columns: repeat(7, 60px); grid-gap: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; }
-        .c4-cell-mask {
-            width: 60px; height: 60px; background: transparent; border-radius: 50%; cursor: pointer;
-            position: relative; overflow: hidden; /* Hides piece until it drops */
-            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.2);
-            border: 4px solid var(--plastic-blue);
-        }
-        .c4-piece {
-            width: 100%; height: 100%; border-radius: 50%; position: absolute; top: 0; left: 0;
-            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
-        }
-        .c4-piece.red { background: radial-gradient(circle at 30% 30%, #ff8a80, var(--plastic-red)); border: 2px solid #b71c1c; }
-        .c4-piece.yellow { background: radial-gradient(circle at 30% 30%, #ffff8d, var(--plastic-yellow)); border: 2px solid #f57f17; }
         
-        /* THE BOUNCE */
-        .c4-piece.drop-anim { animation: dropBounce 0.6s ease-in forwards; }
-        @keyframes dropBounce {
-            0% { transform: translateY(-500px); animation-timing-function: ease-in; }
-            40% { transform: translateY(0); animation-timing-function: ease-out; }
-            65% { transform: translateY(-40px); animation-timing-function: ease-in; }
-            80% { transform: translateY(0); animation-timing-function: ease-out; }
-            95% { transform: translateY(-10px); animation-timing-function: ease-in; }
-            100% { transform: translateY(0); }
+        .c4-layer-container {
+            position: relative;
+            /* 7 cols * 70px = 490px */
+            width: 490px; 
+            /* 6 rows * 70px = 420px */
+            height: 420px; 
+            background: #003c8f; /* Dark background behind pieces */
+            overflow: hidden; /* Hide pieces before they enter top */
+            border-radius: 5px;
         }
 
-        /* --- TIC TAC TOE: REALISM --- */
+        /* The layer where chips actually live */
+        .c4-pieces-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* The blue board on top */
+        .c4-mask-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: repeat(7, 70px);
+            grid-template-rows: repeat(6, 70px);
+            pointer-events: none; /* Let clicks pass through to layer below */
+        }
+        
+        /* The "Hole" is transparent, the rest is blue */
+        .c4-mask-cell {
+            width: 70px; height: 70px;
+            /* Radial gradient: Transparent center (hole), Blue outer */
+            background: radial-gradient(circle at center, transparent 28px, var(--plastic-blue) 29px);
+            /* Add highlight for plastic shine */
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.3), inset -1px -1px 2px rgba(0,0,0,0.3);
+        }
+        
+        /* Click Targets (Invisible on top) */
+        .c4-click-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .c4-col-trigger { height: 100%; cursor: pointer; }
+        .c4-col-trigger:hover { background: rgba(255,255,255,0.1); }
+
+        .c4-piece {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            position: absolute;
+            /* Start slightly above the board */
+            top: -70px; 
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5), inset 5px 5px 10px rgba(255,255,255,0.3);
+        }
+        .c4-piece.red { background: var(--plastic-red); border: 2px solid #b71c1c; }
+        .c4-piece.yellow { background: var(--plastic-yellow); border: 2px solid #f9a825; }
+
+        /* Animation using CSS Variables for dynamic drop height */
+        .falling {
+            animation: fallAndBounce 0.6s cubic-bezier(0.5, 0, 0.5, 1) forwards;
+        }
+
+        @keyframes fallAndBounce {
+            0% { transform: translateY(0); }
+            60% { transform: translateY(var(--dest)); animation-timing-function: ease-out; }
+            75% { transform: translateY(calc(var(--dest) - 30px)); animation-timing-function: ease-in; }
+            85% { transform: translateY(var(--dest)); animation-timing-function: ease-out; }
+            95% { transform: translateY(calc(var(--dest) - 10px)); animation-timing-function: ease-in; }
+            100% { transform: translateY(var(--dest)); }
+        }
+
+        /* --- 2. TIC TAC TOE --- */
         .ttt-board {
             display: grid; grid-template-columns: repeat(3, 110px); grid-gap: 15px;
             background-color: var(--accent-brass); padding: 10px; border-radius: 15px;
@@ -189,16 +213,14 @@
         }
         .ttt-cell:hover { background-color: #0d5c12; }
         .ttt-piece {
-            position: absolute;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
-            transform-origin: center;
-            animation: stampIn 0.2s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+            position: absolute; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
+            transform-origin: center; animation: stampIn 0.2s cubic-bezier(0.5, 0, 0.75, 0) forwards;
         }
-        .ttt-piece.x { color: #aed581; background: linear-gradient(to bottom, #dcedc8, #aed581); -webkit-background-clip: text; color: transparent; }
-        .ttt-piece.o { color: #ffab91; background: linear-gradient(to bottom, #ffccbc, #ffab91); -webkit-background-clip: text; color: transparent; }
+        .ttt-piece.x { background: linear-gradient(to bottom, #dcedc8, #aed581); -webkit-background-clip: text; color: transparent; }
+        .ttt-piece.o { background: linear-gradient(to bottom, #ffccbc, #ffab91); -webkit-background-clip: text; color: transparent; }
         @keyframes stampIn { from { transform: scale(2) rotate(var(--r, 0deg)); opacity: 0; } to { transform: scale(1) rotate(var(--r, 0deg)); opacity: 1; } }
 
-        /* --- CHECKERS --- */
+        /* --- 3. CHECKERS --- */
         .checkers-board {
             display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px);
             border: 15px solid var(--wood-light); box-shadow: 0 20px 40px rgba(0,0,0,0.6);
@@ -207,7 +229,6 @@
         .chk-cell.light { background: #eecfa1; }
         .chk-cell.dark { background: #5d4037; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
         .chk-cell.highlight { box-shadow: inset 0 0 0 3px #76ff03; cursor: pointer; }
-        
         .chk-piece {
             width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 5px; left: 5px;
             box-shadow: 0 5px 5px rgba(0,0,0,0.5), inset 0 0 0 5px rgba(0,0,0,0.1);
@@ -216,14 +237,12 @@
         }
         .chk-piece:hover { transform: translateY(-3px); box-shadow: 0 8px 8px rgba(0,0,0,0.6); }
         .chk-piece.selected { box-shadow: 0 0 0 3px #ffff00, 0 8px 8px rgba(0,0,0,0.6); transform: scale(1.1); z-index: 10; }
-        
         .chk-piece.p1 { background: radial-gradient(#d32f2f, #b71c1c); border: 2px solid #e57373; }
         .chk-piece.p2 { background: radial-gradient(#424242, #212121); border: 2px solid #616161; }
-        
         .chk-king-icon { font-size: 30px; color: gold; display: none; text-shadow: 0 2px 2px rgba(0,0,0,0.8); }
         .chk-piece.king .chk-king-icon { display: block; }
 
-        /* --- REVERSI --- */
+        /* --- 4. REVERSI --- */
         .reversi-board { display: grid; grid-template-columns: repeat(8, 50px); grid-gap: 4px; background: #333; padding: 8px; border-radius: 5px; border: 4px solid #444; }
         .reversi-cell { width: 50px; height: 50px; background: var(--felt-green); background-image: var(--felt-texture); display: flex; justify-content: center; align-items: center; perspective: 600px; cursor: pointer; }
         .reversi-cell.legal-move::after { content: ''; width: 15px; height: 15px; background: rgba(0,0,0,0.2); border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); }
@@ -267,39 +286,159 @@
 
     <script>
         /**
-         * CLUBHOUSE ARCHITECT ENGINE v3
-         * Features: PvP Toggle, Physics Animation, New Checkers Game
+         * CLUBHOUSE ARCHITECT ENGINE v4
+         * Connect 4 Update: Layered rendering for "falling behind the holes" effect.
          */
 
         class BoardGame {
             constructor(container, statusElement, vsAI) {
                 this.container = container;
                 this.statusEl = statusElement;
-                this.vsAI = vsAI; // boolean: true if playing computer
-                this.isPlayerTurn = true; // Player 1 is always start
+                this.vsAI = vsAI; 
+                this.isPlayerTurn = true; 
                 this.gameOver = false;
                 this.init();
             }
             updateStatus(msg) { this.statusEl.innerText = msg; }
             aiDelay(callback) { setTimeout(callback, 800); }
             
-            // Handles switching turns and checking if AI should move
             endTurn() {
                 this.isPlayerTurn = !this.isPlayerTurn;
                 if(this.gameOver) return;
-
                 if (this.vsAI && !this.isPlayerTurn) {
                     this.updateStatus("AI Thinking...");
                     this.aiDelay(() => this.makeAIMove());
                 } else {
-                    // PvP or Player's turn
                     const pName = this.isPlayerTurn ? "Player 1" : "Player 2";
                     this.updateStatus(`${pName}'s Turn`);
                 }
             }
         }
 
-        // --- 1. TIC TAC TOE (Randomized Placement, No Refresh) ---
+        // --- 1. CONNECT FOUR (Updated Layered System) ---
+        class ConnectFour extends BoardGame {
+            init() {
+                this.rows = 6; this.cols = 7;
+                this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(null));
+                this.isPlayerTurn = true;
+                this.gameOver = false;
+                this.renderStructure();
+                this.updateStatus(this.vsAI ? "Your Turn (Red)" : "Player 1 (Red)");
+            }
+            
+            renderStructure() {
+                // We create a layered stack: Pieces on Bottom (z1), Mask on Top (z2), Clicks on TopTop (z3)
+                this.container.innerHTML = `
+                    <div class="c4-frame">
+                        <div class="c4-layer-container">
+                            <div class="c4-pieces-layer" id="c4-pieces"></div>
+                            <div class="c4-mask-layer" id="c4-mask"></div>
+                            <div class="c4-click-layer" id="c4-clicks"></div>
+                        </div>
+                    </div>`;
+                
+                const maskLayer = document.getElementById('c4-mask');
+                const clickLayer = document.getElementById('c4-clicks');
+                
+                // Build the Mask Grid (Visuals)
+                for(let i=0; i<42; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'c4-mask-cell';
+                    maskLayer.appendChild(cell);
+                }
+
+                // Build the Click Triggers (Interaction)
+                for(let c=0; c<7; c++) {
+                    const col = document.createElement('div');
+                    col.className = 'c4-col-trigger';
+                    col.onclick = () => this.handleMove(c);
+                    clickLayer.appendChild(col);
+                }
+            }
+
+            handleMove(col) {
+                if(this.gameOver) return;
+                if(this.vsAI && !this.isPlayerTurn) return;
+
+                let row = -1;
+                // Find bottom-most empty spot
+                for(let r=this.rows-1; r>=0; r--) {
+                    if(!this.board[r][col]) { row = r; break; }
+                }
+                if(row === -1) return; // Column full
+
+                const color = this.isPlayerTurn ? 'red' : 'yellow';
+                
+                // Logic Update
+                this.board[row][col] = color;
+                
+                // Visual Update (Animation)
+                this.spawnPiece(row, col, color);
+
+                if(this.checkWin(row, col, color)) {
+                    this.gameOver = true;
+                    this.updateStatus(this.isPlayerTurn ? (this.vsAI ? "You Win!" : "Player 1 Wins!") : (this.vsAI ? "AI Wins!" : "Player 2 Wins!"));
+                    return;
+                }
+                this.endTurn();
+            }
+
+            spawnPiece(row, col, color) {
+                const piecesLayer = document.getElementById('c4-pieces');
+                const piece = document.createElement('div');
+                piece.className = `c4-piece ${color} falling`;
+                
+                // 70px is the cell height/width
+                // 5px is the padding to center the 60px piece inside the 70px cell
+                const leftPos = (col * 70) + 5;
+                const topTarget = (row * 70) + 5;
+                
+                piece.style.left = `${leftPos}px`;
+                // We pass the destination to CSS for the keyframe calculation
+                piece.style.setProperty('--dest', `${topTarget + 70}px`); // +70 because we start at -70 top
+                
+                piecesLayer.appendChild(piece);
+            }
+
+            makeAIMove() {
+                let move = this.findBestMove('yellow') || this.findBestMove('red') || this.getRandomMove();
+                if (move !== null) {
+                    let r = -1;
+                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][move]) { r = i; break; } }
+                    this.spawnPiece(r, move, 'yellow');
+                    this.board[r][move] = 'yellow';
+                    if (this.checkWin(r, move, 'yellow')) { this.gameOver = true; this.updateStatus("AI Wins!"); }
+                    else { this.endTurn(); }
+                }
+            }
+            findBestMove(color) {
+                for (let c = 0; c < this.cols; c++) {
+                    if (this.board[0][c]) continue;
+                    let r = -1;
+                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][c]) { r = i; break; } }
+                    this.board[r][c] = color;
+                    let win = this.checkWin(r, c, color);
+                    this.board[r][c] = null;
+                    if (win) return c;
+                } return null;
+            }
+            getRandomMove() {
+                let valid = [];
+                for(let c=0; c<this.cols; c++) if(!this.board[0][c]) valid.push(c);
+                return valid[Math.floor(Math.random()*valid.length)];
+            }
+            checkWin(r, c, color) {
+                const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+                return dirs.some(([dr,dc]) => {
+                    let count = 1;
+                    for(let i=1; i<4; i++) { if(this.board[r+dr*i]?.[c+dc*i] === color) count++; else break; }
+                    for(let i=1; i<4; i++) { if(this.board[r-dr*i]?.[c-dc*i] === color) count++; else break; }
+                    return count >= 4;
+                });
+            }
+        }
+
+        // --- 2. TIC TAC TOE ---
         class TicTacToe extends BoardGame {
             init() {
                 this.board = Array(9).fill(null);
@@ -321,7 +460,7 @@
             }
             handleMove(idx) {
                 if (this.board[idx] || this.gameOver) return;
-                if (this.vsAI && !this.isPlayerTurn) return; // Wait for AI
+                if (this.vsAI && !this.isPlayerTurn) return; 
 
                 const symbol = this.isPlayerTurn ? 'X' : 'O';
                 this.placePiece(idx, symbol);
@@ -341,7 +480,6 @@
             placePiece(idx, symbol) {
                 this.board[idx] = symbol;
                 const cell = document.getElementById(`ttt-cell-${idx}`);
-                // Create random rotation for hand-drawn look
                 const rot = Math.floor(Math.random() * 40) - 20; 
                 const piece = document.createElement('div');
                 piece.className = `ttt-piece ${symbol.toLowerCase()}`;
@@ -350,7 +488,6 @@
                 cell.appendChild(piece);
             }
             makeAIMove() {
-                // Minimax
                 let bestScore = -Infinity, move;
                 for (let i=0; i<9; i++) {
                     if (this.board[i] === null) {
@@ -387,100 +524,126 @@
             }
         }
 
-        // --- 2. CONNECT FOUR (Gravity Physics) ---
-        class ConnectFour extends BoardGame {
+        // --- 3. CHECKERS ---
+        class Checkers extends BoardGame {
             init() {
-                this.rows = 6; this.cols = 7;
-                this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(null));
-                this.isPlayerTurn = true;
-                this.gameOver = false;
+                this.board = Array(8).fill().map(()=>Array(8).fill(null));
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if((r+c)%2===1) {
+                            if(r<3) this.board[r][c] = {p:2, k:false};
+                            else if(r>4) this.board[r][c] = {p:1, k:false};
+                        }
+                    }
+                }
+                this.selected = null;
+                this.validMoves = [];
                 this.renderBoard();
                 this.updateStatus(this.vsAI ? "Your Turn (Red)" : "Player 1 (Red)");
             }
             renderBoard() {
-                this.container.innerHTML = `<div class="c4-board-frame"><div class="c4-grid"></div></div>`;
-                const grid = this.container.querySelector('.c4-grid');
-                this.cells = [];
-                for(let r=0; r<this.rows; r++) {
-                    const rowArr = [];
-                    for(let c=0; c<this.cols; c++) {
+                this.container.innerHTML = '<div class="checkers-board"></div>';
+                const el = this.container.querySelector('.checkers-board');
+                this.domGrid = [];
+                for(let r=0; r<8; r++) {
+                    let rowArr = [];
+                    for(let c=0; c<8; c++) {
                         const cell = document.createElement('div');
-                        cell.className = 'c4-cell-mask';
-                        cell.onclick = () => this.handleMove(c);
-                        grid.appendChild(cell);
+                        cell.className = `chk-cell ${(r+c)%2===0?'light':'dark'}`;
+                        cell.onclick = () => this.handleCellClick(r,c);
+                        el.appendChild(cell);
                         rowArr.push(cell);
                     }
-                    this.cells.push(rowArr);
+                    this.domGrid.push(rowArr);
                 }
+                this.drawPieces();
             }
-            handleMove(col) {
+            drawPieces() {
+                this.domGrid.forEach(r => r.forEach(c => { c.innerHTML=''; c.classList.remove('highlight'); }));
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        const d = this.board[r][c];
+                        if(d) {
+                            const p = document.createElement('div');
+                            p.className = `chk-piece p${d.p} ${d.k?'king':''}`;
+                            if(this.selected && this.selected.r===r && this.selected.c===c) p.classList.add('selected');
+                            p.innerHTML = '<span class="chk-king-icon">♛</span>';
+                            this.domGrid[r][c].appendChild(p);
+                        }
+                    }
+                }
+                this.validMoves.forEach(m => { this.domGrid[m.r][m.c].classList.add('highlight'); });
+            }
+            handleCellClick(r,c) {
                 if(this.gameOver) return;
                 if(this.vsAI && !this.isPlayerTurn) return;
-
-                let row = -1;
-                for(let r=this.rows-1; r>=0; r--) {
-                    if(!this.board[r][col]) { row = r; break; }
-                }
-                if(row === -1) return;
-
-                const color = this.isPlayerTurn ? 'red' : 'yellow';
-                this.animateDrop(row, col, color);
-                this.board[row][col] = color;
-
-                if(this.checkWin(row, col, color)) {
-                    this.gameOver = true;
-                    const winner = this.isPlayerTurn ? (this.vsAI ? "You Win!" : "Player 1 Wins!") : (this.vsAI ? "AI Wins!" : "Player 2 Wins!");
-                    this.updateStatus(winner);
+                const clickedPiece = this.board[r][c];
+                const currentPlayer = this.isPlayerTurn ? 1 : 2;
+                if(clickedPiece && clickedPiece.p === currentPlayer) {
+                    this.selected = {r,c};
+                    this.validMoves = this.getMoves(r, c, this.board);
+                    this.drawPieces();
                     return;
                 }
-                this.endTurn();
-            }
-            animateDrop(r, c, color) {
-                const cell = this.cells[r][c];
-                const piece = document.createElement('div');
-                piece.className = `c4-piece ${color} drop-anim`;
-                cell.appendChild(piece);
-            }
-            makeAIMove() {
-                // Heuristic AI
-                let move = this.findBestMove('yellow') || this.findBestMove('red') || this.getRandomMove();
-                if (move !== null) {
-                    let r = -1;
-                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][move]) { r = i; break; } }
-                    this.animateDrop(r, move, 'yellow');
-                    this.board[r][move] = 'yellow';
-                    if (this.checkWin(r, move, 'yellow')) { this.gameOver = true; this.updateStatus("AI Wins!"); }
-                    else { this.endTurn(); }
+                if(this.selected) {
+                    const move = this.validMoves.find(m => m.r === r && m.c === c);
+                    if(move) this.executeMove(this.selected, move);
+                    else {
+                        this.selected = null;
+                        this.validMoves = [];
+                        this.drawPieces();
+                    }
                 }
             }
-            findBestMove(color) {
-                for (let c = 0; c < this.cols; c++) {
-                    if (this.board[0][c]) continue;
-                    let r = -1;
-                    for (let i = this.rows - 1; i >= 0; i--) { if (!this.board[i][c]) { r = i; break; } }
-                    this.board[r][c] = color;
-                    let win = this.checkWin(r, c, color);
-                    this.board[r][c] = null;
-                    if (win) return c;
-                } return null;
-            }
-            getRandomMove() {
-                let valid = [];
-                for(let c=0; c<this.cols; c++) if(!this.board[0][c]) valid.push(c);
-                return valid[Math.floor(Math.random()*valid.length)];
-            }
-            checkWin(r, c, color) {
-                const dirs = [[0,1],[1,0],[1,1],[1,-1]];
-                return dirs.some(([dr,dc]) => {
-                    let count = 1;
-                    for(let i=1; i<4; i++) { if(this.board[r+dr*i]?.[c+dc*i] === color) count++; else break; }
-                    for(let i=1; i<4; i++) { if(this.board[r-dr*i]?.[c-dc*i] === color) count++; else break; }
-                    return count >= 4;
+            getMoves(r, c, board) {
+                const p = board[r][c];
+                if(!p) return [];
+                const moves = [];
+                const dirs = p.k ? [[-1,-1],[-1,1],[1,-1],[1,1]] : (p.p===1 ? [[-1,-1],[-1,1]] : [[1,-1],[1,1]]);
+                dirs.forEach(([dr, dc]) => {
+                    if(this.inBounds(r+dr, c+dc) && board[r+dr][c+dc]===null) moves.push({r:r+dr, c:c+dc, jump:false});
+                    if(this.inBounds(r+dr*2, c+dc*2)) {
+                        const mid = board[r+dr][c+dc];
+                        const land = board[r+dr*2][c+dc*2];
+                        if(mid && mid.p !== p.p && land === null) moves.push({r:r+dr*2, c:c+dc*2, jump:true, kill:{r:r+dr, c:c+dc}});
+                    }
                 });
+                return moves;
+            }
+            inBounds(r,c) { return r>=0 && r<8 && c>=0 && c<8; }
+            executeMove(from, to) {
+                const piece = this.board[from.r][from.c];
+                this.board[to.r][to.c] = piece;
+                this.board[from.r][from.c] = null;
+                if((piece.p===1 && to.r===0) || (piece.p===2 && to.r===7)) piece.k = true;
+                if(to.jump) this.board[to.kill.r][to.kill.c] = null;
+                this.selected = null; this.validMoves = []; this.drawPieces();
+                this.checkWinCondition();
+                if(!this.gameOver) this.endTurn();
+            }
+            checkWinCondition() {
+                let p1=0, p2=0;
+                this.board.forEach(r => r.forEach(c => { if(c){ if(c.p===1)p1++; else p2++; } }));
+                if(p1===0 || p2===0) { this.gameOver = true; this.updateStatus(p2===0 ? "Red Wins!" : "Black Wins!"); }
+            }
+            makeAIMove() {
+                let allMoves = [];
+                for(let r=0; r<8; r++) {
+                    for(let c=0; c<8; c++) {
+                        if(this.board[r][c] && this.board[r][c].p === 2) {
+                            let moves = this.getMoves(r, c, this.board);
+                            moves.forEach(m => allMoves.push({from:{r,c}, to:m}));
+                        }
+                    }
+                }
+                if(allMoves.length === 0) { this.gameOver = true; this.updateStatus("Red Wins!"); return; }
+                const jumps = allMoves.filter(m => m.to.jump);
+                const move = jumps.length > 0 ? jumps[Math.floor(Math.random()*jumps.length)] : allMoves[Math.floor(Math.random()*allMoves.length)];
+                this.executeMove(move.from, move.to);
             }
         }
 
-        // --- 3. REVERSI (Updated for PvP) ---
+        // --- 4. REVERSI ---
         class Reversi extends BoardGame {
             init() {
                 this.rows=8; this.cols=8;
@@ -530,13 +693,9 @@
                     }
                 }
                 this.renderUpdates();
-                
-                // Pass logic
                 if(this.legalMoves.length===0 && !this.gameOver) {
                     if(!this.hasMoves(1) && !this.hasMoves(2)) { this.endGame(); return; }
-                    // Pass turn
                     this.endTurn(); 
-                    // Need to recalc legal moves for next player immediately
                     setTimeout(()=>this.updateLegalMoves(), 500); 
                 }
             }
@@ -566,196 +725,24 @@
             }
             makeAIMove() {
                 if(this.legalMoves.length===0) return;
-                // Simple weighting
                 let best = this.legalMoves[0];
                 let max = -Infinity;
                 const weights = [
-                    [100,-20,10,5,5,10,-20,100],
-                    [-20,-50,-2,-2,-2,-2,-50,-20],
-                    [10,-2,-1,-1,-1,-1,-2,10],
-                    [5,-2,-1,-1,-1,-1,-2,5],
-                    [5,-2,-1,-1,-1,-1,-2,5],
-                    [10,-2,-1,-1,-1,-1,-2,10],
-                    [-20,-50,-2,-2,-2,-2,-50,-20],
-                    [100,-20,10,5,5,10,-20,100]
+                    [100,-20,10,5,5,10,-20,100], [-20,-50,-2,-2,-2,-2,-50,-20], [10,-2,-1,-1,-1,-1,-2,10],
+                    [5,-2,-1,-1,-1,-1,-2,5], [5,-2,-1,-1,-1,-1,-2,5], [10,-2,-1,-1,-1,-1,-2,10],
+                    [-20,-50,-2,-2,-2,-2,-50,-20], [100,-20,10,5,5,10,-20,100]
                 ];
                 this.legalMoves.forEach(m=>{
                     let s = weights[m.r][m.c] + m.flips.length;
                     if(s>max){max=s; best=m;}
                 });
-                this.handleMove(best.r, best.c); // Re-use handleMove for simplicity
+                this.handleMove(best.r, best.c);
             }
             hasMoves(p){ for(let r=0;r<8;r++)for(let c=0;c<8;c++) if(this.board[r][c]===0 && this.getFlips(r,c,p).length>0) return true; return false; }
             endGame(){
                 this.gameOver=true;
                 let b=0, w=0; this.board.forEach(r=>r.forEach(c=>{if(c===1)b++; if(c===2)w++;}));
                 this.updateStatus(`Game Over! Black:${b} White:${w}`);
-            }
-        }
-
-        // --- 4. CHECKERS (New Game) ---
-        class Checkers extends BoardGame {
-            init() {
-                this.board = Array(8).fill().map(()=>Array(8).fill(null));
-                // 1=Red(Player/Bottom), 2=Black(AI/Top)
-                // Pieces stored as { player: 1, king: false }
-                for(let r=0; r<8; r++) {
-                    for(let c=0; c<8; c++) {
-                        if((r+c)%2===1) {
-                            if(r<3) this.board[r][c] = {p:2, k:false};
-                            else if(r>4) this.board[r][c] = {p:1, k:false};
-                        }
-                    }
-                }
-                this.selected = null;
-                this.validMoves = [];
-                this.renderBoard();
-                this.updateStatus(this.vsAI ? "Your Turn (Red)" : "Player 1 (Red)");
-            }
-            renderBoard() {
-                this.container.innerHTML = '<div class="checkers-board"></div>';
-                const el = this.container.querySelector('.checkers-board');
-                this.domGrid = [];
-                for(let r=0; r<8; r++) {
-                    let rowArr = [];
-                    for(let c=0; c<8; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = `chk-cell ${(r+c)%2===0?'light':'dark'}`;
-                        cell.onclick = () => this.handleCellClick(r,c);
-                        el.appendChild(cell);
-                        rowArr.push(cell);
-                    }
-                    this.domGrid.push(rowArr);
-                }
-                this.drawPieces();
-            }
-            drawPieces() {
-                // Clear highlights
-                this.domGrid.forEach(r => r.forEach(c => { c.innerHTML=''; c.classList.remove('highlight'); }));
-                
-                // Draw pieces
-                for(let r=0; r<8; r++) {
-                    for(let c=0; c<8; c++) {
-                        const d = this.board[r][c];
-                        if(d) {
-                            const p = document.createElement('div');
-                            p.className = `chk-piece p${d.p} ${d.k?'king':''}`;
-                            if(this.selected && this.selected.r===r && this.selected.c===c) p.classList.add('selected');
-                            p.innerHTML = '<span class="chk-king-icon">♛</span>';
-                            // Pass click through to cell
-                            this.domGrid[r][c].appendChild(p);
-                        }
-                    }
-                }
-                // Draw valid moves
-                this.validMoves.forEach(m => {
-                    this.domGrid[m.r][m.c].classList.add('highlight');
-                });
-            }
-            handleCellClick(r,c) {
-                if(this.gameOver) return;
-                if(this.vsAI && !this.isPlayerTurn) return;
-
-                const clickedPiece = this.board[r][c];
-                const currentPlayer = this.isPlayerTurn ? 1 : 2;
-
-                // Select Piece
-                if(clickedPiece && clickedPiece.p === currentPlayer) {
-                    this.selected = {r,c};
-                    this.validMoves = this.getMoves(r, c, this.board);
-                    this.drawPieces();
-                    return;
-                }
-
-                // Move Piece
-                if(this.selected) {
-                    const move = this.validMoves.find(m => m.r === r && m.c === c);
-                    if(move) {
-                        this.executeMove(this.selected, move);
-                    } else {
-                        // Deselect if clicking elsewhere
-                        this.selected = null;
-                        this.validMoves = [];
-                        this.drawPieces();
-                    }
-                }
-            }
-            getMoves(r, c, board) {
-                const p = board[r][c];
-                if(!p) return [];
-                const moves = [];
-                const dirs = p.k ? [[-1,-1],[-1,1],[1,-1],[1,1]] : (p.p===1 ? [[-1,-1],[-1,1]] : [[1,-1],[1,1]]);
-                
-                dirs.forEach(([dr, dc]) => {
-                    // Walk
-                    if(this.inBounds(r+dr, c+dc) && board[r+dr][c+dc]===null) {
-                        moves.push({r:r+dr, c:c+dc, jump:false});
-                    }
-                    // Jump
-                    if(this.inBounds(r+dr*2, c+dc*2)) {
-                        const mid = board[r+dr][c+dc];
-                        const land = board[r+dr*2][c+dc*2];
-                        if(mid && mid.p !== p.p && land === null) {
-                            moves.push({r:r+dr*2, c:c+dc*2, jump:true, kill:{r:r+dr, c:c+dc}});
-                        }
-                    }
-                });
-                return moves;
-            }
-            inBounds(r,c) { return r>=0 && r<8 && c>=0 && c<8; }
-            
-            executeMove(from, to) {
-                // Move logic
-                const piece = this.board[from.r][from.c];
-                this.board[to.r][to.c] = piece;
-                this.board[from.r][from.c] = null;
-                
-                // King me
-                if((piece.p===1 && to.r===0) || (piece.p===2 && to.r===7)) piece.k = true;
-
-                // Kill
-                if(to.jump) {
-                    this.board[to.kill.r][to.kill.c] = null;
-                }
-
-                this.selected = null;
-                this.validMoves = [];
-                this.drawPieces();
-                this.checkWinCondition();
-                
-                if(!this.gameOver) this.endTurn();
-            }
-
-            checkWinCondition() {
-                let p1=0, p2=0;
-                this.board.forEach(r => r.forEach(c => { if(c){ if(c.p===1)p1++; else p2++; } }));
-                if(p1===0 || p2===0) {
-                    this.gameOver = true;
-                    this.updateStatus(p2===0 ? "Red Wins!" : "Black Wins!");
-                }
-            }
-
-            makeAIMove() {
-                // AI Logic: Gather all pieces, find all moves
-                let allMoves = [];
-                for(let r=0; r<8; r++) {
-                    for(let c=0; c<8; c++) {
-                        if(this.board[r][c] && this.board[r][c].p === 2) {
-                            let moves = this.getMoves(r, c, this.board);
-                            moves.forEach(m => allMoves.push({from:{r,c}, to:m}));
-                        }
-                    }
-                }
-                
-                if(allMoves.length === 0) {
-                    this.gameOver = true; this.updateStatus("Red Wins!"); return;
-                }
-
-                // Prioritize jumps
-                const jumps = allMoves.filter(m => m.to.jump);
-                const move = jumps.length > 0 ? jumps[Math.floor(Math.random()*jumps.length)] : allMoves[Math.floor(Math.random()*allMoves.length)];
-
-                this.executeMove(move.from, move.to);
             }
         }
 
@@ -775,10 +762,9 @@
                     { id: 'backgammon', name: 'Backgammon', icon: '🎲', active: false }
                 ];
                 this.currentGame = null;
-                this.pendingGame = null; // Stored game meta while selecting mode
+                this.pendingGame = null; 
                 this.initHub();
             }
-
             initHub() {
                 const grid = document.getElementById('game-grid');
                 this.games.forEach(game => {
@@ -793,30 +779,23 @@
                     grid.appendChild(card);
                 });
             }
-
             promptMode(gameMeta) {
                 this.pendingGame = gameMeta;
                 document.getElementById('mode-modal').classList.add('active');
             }
-
             confirmMode(vsAI) {
                 document.getElementById('mode-modal').classList.remove('active');
-                if(this.pendingGame) {
-                    this.launchGame(this.pendingGame, vsAI);
-                }
+                if(this.pendingGame) { this.launchGame(this.pendingGame, vsAI); }
             }
-
             launchGame(gameMeta, vsAI) {
                 const hub = document.getElementById('game-hub');
                 hub.style.transform = 'perspective(1000px) rotateX(15deg) scale(0.9) translateY(50px)';
                 hub.style.opacity = '0';
-                
                 setTimeout(() => {
                     hub.style.display = 'none';
                     const container = document.getElementById('active-game-container');
                     container.classList.add('visible');
                     document.getElementById('current-game-title').innerText = gameMeta.name;
-                    
                     this.currentGame = new gameMeta.class(
                         document.getElementById('game-board-container'),
                         document.getElementById('game-status'),
@@ -824,7 +803,6 @@
                     );
                 }, 500);
             }
-
             returnToHub() {
                 const container = document.getElementById('active-game-container');
                 container.classList.remove('visible');
@@ -838,10 +816,7 @@
                     document.getElementById('game-board-container').innerHTML = '';
                 }, 600);
             }
-
-            resetCurrentGame() {
-                if (this.currentGame) this.currentGame.init();
-            }
+            resetCurrentGame() { if (this.currentGame) this.currentGame.init(); }
         }
 
         const app = new GameEngine();
