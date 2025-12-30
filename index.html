@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clubhouse Deluxe v6</title>
+    <title>Clubhouse Deluxe v7</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&family=Courier+Prime:wght@700&display=swap" rel="stylesheet">
     <style>
         /* --- CORE VISUALS --- */
@@ -91,12 +92,103 @@
         }
         .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
         .btn:active { transform: translateY(4px); box-shadow: 0 0px 0 #2d1b18; }
-        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; padding: 20px; }
+        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; padding: 20px; overflow: hidden; }
         .status-display {
             font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; background: rgba(0,0,0,0.6);
             color: var(--accent-gold); padding: 10px 40px; border-radius: 50px; border: 3px solid var(--accent-brass);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-align: center; min-width: 300px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-align: center; min-width: 300px; z-index: 5;
         }
+
+        /* --- YAHTZEE SPECIFIC --- */
+        .yz-main-container {
+            display: flex; width: 100%; height: 100%; max-width: 1200px; gap: 20px;
+        }
+        .yz-section-score {
+            flex: 0 0 350px;
+            background: #f4f1ea;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex; flex-direction: column;
+            color: #2c3e50;
+            font-family: 'Courier Prime', monospace;
+            overflow-y: auto;
+            border: 1px solid #d7ccc8;
+        }
+        .yz-section-game {
+            flex: 1; display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 8px solid var(--wood-light);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+        }
+        /* Hold Rack */
+        .yz-hold-rack {
+            height: 90px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 4px solid var(--wood-dark);
+            display: flex; align-items: center; justify-content: center;
+            padding: 10px; gap: 15px;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3);
+        }
+        .yz-hold-slot {
+            width: 60px; height: 60px;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s;
+        }
+        .yz-hold-slot.drag-over { background: rgba(255,255,255,0.1); border-color: var(--accent-gold); transform: scale(1.1); }
+        
+        .yz-die-dom {
+            width: 56px; height: 56px;
+            background: white; border-radius: 8px;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.3);
+            display: grid; padding: 4px;
+            cursor: grab;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        .yz-die-dom:active { cursor: grabbing; transform: scale(1.05); }
+        .yz-die-dom.rolling-anim { animation: rollAnim 0.5s infinite linear; }
+        
+        /* Pips Grid */
+        .pips-1 { grid-template-areas: ". . ." ". a ." ". . ."; }
+        .pips-2 { grid-template-areas: "a . ." ". . ." ". . b"; }
+        .pips-3 { grid-template-areas: "a . ." ". b ." ". . c"; }
+        .pips-4 { grid-template-areas: "a . b" ". . ." "c . d"; }
+        .pips-5 { grid-template-areas: "a . b" ". c ." "d . e"; }
+        .pips-6 { grid-template-areas: "a . b" "c . d" "e . f"; }
+        .pip { width: 10px; height: 10px; background: #222; border-radius: 50%; justify-self: center; align-self: center; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5); }
+        .pip:nth-child(1) { grid-area: a; } .pip:nth-child(2) { grid-area: b; }
+        .pip:nth-child(3) { grid-area: c; } .pip:nth-child(4) { grid-area: d; }
+        .pip:nth-child(5) { grid-area: e; } .pip:nth-child(6) { grid-area: f; }
+        .pip.red { background: #d32f2f; }
+
+        /* Canvas Area */
+        #yz-canvas-wrapper {
+            flex: 1; position: relative; overflow: hidden; cursor: pointer;
+        }
+        #yz-canvas-wrapper canvas { display: block; width: 100%; height: 100%; }
+        .yz-controls {
+            padding: 15px; display: flex; justify-content: center; gap: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            position: absolute; bottom: 0; width: 100%; pointer-events: none;
+        }
+        .yz-controls button { pointer-events: auto; font-size: 1.2rem; min-width: 150px; }
+
+        /* Scorecard styling */
+        .yz-sc-header { display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 10px; font-weight: 800; font-size: 1.1rem; }
+        .yz-sc-row { display: flex; justify-content: space-between; padding: 6px 4px; border-bottom: 1px solid #ddd; align-items: center; transition: background 0.2s; }
+        .yz-sc-row:hover:not(.filled):not(.header) { background: #e0f7fa; }
+        .yz-sc-cat { font-weight: 600; font-size: 0.95rem; }
+        .yz-sc-val { width: 40px; text-align: center; height: 28px; line-height: 28px; border-radius: 4px; font-weight: bold; }
+        .yz-sc-val.p1-col { background: rgba(0,0,0,0.05); border-left: 2px solid transparent; }
+        .yz-sc-val.p2-col { background: rgba(0,0,0,0.05); border-left: 2px solid transparent; }
+        .yz-sc-val.active-turn { background: #fff; border: 1px solid #bbb; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; color: #0277bd; }
+        .yz-sc-val.active-turn:hover { background: #bbdefb; }
+        .yz-sc-val.locked { color: #333; cursor: default; }
 
         /* --- CONNECT FOUR (Improved Physics) --- */
         .c4-frame { position: relative; padding: 15px; background: var(--plastic-blue-dark); border-radius: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.5); }
@@ -111,60 +203,14 @@
         .c4-piece.red { background: var(--plastic-red); border: 2px solid #b71c1c; }
         .c4-piece.yellow { background: var(--plastic-yellow); border: 2px solid #f9a825; }
         
-        /* Realistic Gravity Curve */
         .falling { animation: realisticDrop 0.6s cubic-bezier(0.5, 0.05, 1, 0.5) forwards; }
         @keyframes realisticDrop {
             0% { transform: translateY(0); }
-            60% { transform: translateY(var(--dest)); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); } /* Hit bottom */
-            75% { transform: translateY(calc(var(--dest) - 30px)); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); } /* Bounce up */
-            85% { transform: translateY(var(--dest)); animation-timing-function: ease-out; } /* Hit bottom again */
-            95% { transform: translateY(calc(var(--dest) - 8px)); animation-timing-function: ease-in; } /* Micro bounce */
-            100% { transform: translateY(var(--dest)); } /* Settle */
-        }
-
-        /* --- YAHTZEE --- */
-        .yz-layout { display: flex; gap: 20px; height: 100%; width: 100%; max-width: 900px; }
-        .yz-board { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 20px; }
-        .yz-scorecard { width: 320px; background: #fff; color: #333; border-radius: 5px; padding: 10px; font-family: 'Courier Prime', monospace; font-size: 0.9rem; height: 100%; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        
-        .dice-container { display: flex; gap: 15px; margin-bottom: 30px; perspective: 600px; height: 100px; align-items: center; }
-        .die { width: 60px; height: 60px; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
-        .die.rolling { animation: shake 0.5s infinite; }
-        .die.held .die-face { box-shadow: 0 0 0 3px #d32f2f, inset 0 0 10px rgba(0,0,0,0.2); border-color: #d32f2f; }
-        
-        .die-face { position: absolute; width: 60px; height: 60px; background: #fff; border: 1px solid #ccc; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; backface-visibility: hidden; }
-        /* Dice mapping 3D */
-        .face-1 { transform: translateZ(30px); }
-        .face-2 { transform: rotateY(180deg) translateZ(30px); }
-        .face-3 { transform: rotateY(90deg) translateZ(30px); }
-        .face-4 { transform: rotateY(-90deg) translateZ(30px); }
-        .face-5 { transform: rotateX(90deg) translateZ(30px); }
-        .face-6 { transform: rotateX(-90deg) translateZ(30px); }
-        
-        .dot { width: 10px; height: 10px; background: #333; border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5); display: inline-block; margin: 2px; }
-        /* Dot Layouts */
-        .face-1 { display: flex; justify-content: center; align-items: center; }
-        .face-2 { display: flex; justify-content: space-between; padding: 10px; }
-        .face-2 .dot:nth-child(2) { align-self: flex-end; }
-        .face-3 { display: flex; justify-content: space-between; padding: 10px; }
-        .face-3 .dot:nth-child(2) { align-self: center; }
-        .face-3 .dot:nth-child(3) { align-self: flex-end; }
-        .face-4, .face-5, .face-6 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 10px; }
-        .face-5 .dot:nth-child(3) { grid-column: 1 / span 2; justify-self: center; }
-
-        .yz-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee; cursor: pointer; }
-        .yz-row:hover:not(.filled) { background: #eee; }
-        .yz-row.filled { color: #888; cursor: default; }
-        .yz-cat { font-weight: bold; }
-        .yz-val { width: 30px; text-align: center; background: #f0f0f0; border-radius: 3px; }
-        .yz-row.total { background: #333; color: #fff; padding: 5px; margin-top: 5px; }
-
-        @keyframes shake {
-            0% { transform: rotate3d(1,1,1,0deg); }
-            25% { transform: rotate3d(1,1,0,20deg); }
-            50% { transform: rotate3d(0,1,1,-20deg); }
-            75% { transform: rotate3d(1,0,1,20deg); }
-            100% { transform: rotate3d(1,1,1,0deg); }
+            60% { transform: translateY(var(--dest)); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            75% { transform: translateY(calc(var(--dest) - 30px)); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+            85% { transform: translateY(var(--dest)); animation-timing-function: ease-out; }
+            95% { transform: translateY(calc(var(--dest) - 8px)); animation-timing-function: ease-in; }
+            100% { transform: translateY(var(--dest)); }
         }
 
         /* --- CHESS & OTHER SHARED --- */
@@ -189,13 +235,30 @@
         .chip-back { background: radial-gradient(circle at 30% 30%, #fff, #ddd); transform: rotateY(180deg); }
         .reversi-chip.black { transform: rotateY(0deg); }
         .reversi-chip.white { transform: rotateY(180deg); }
+
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 10px; background: var(--wood-light); padding: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .ttt-cell { background: #f0f0f0; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; cursor: pointer; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+        .ttt-piece.x { color: var(--plastic-red); }
+        .ttt-piece.o { color: var(--plastic-blue); }
+
+        .checkers-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #3e2723; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .chk-cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .chk-cell.light { background: #e0c096; }
+        .chk-cell.dark { background: #5d4037; }
+        .chk-cell.highlight { position: relative; }
+        .chk-cell.highlight::after { content: ''; position: absolute; width: 100%; height: 100%; background: rgba(255,235,59,0.4); box-shadow: inset 0 0 10px yellow; }
+        .chk-piece { width: 45px; height: 45px; border-radius: 50%; box-shadow: 0 5px 5px rgba(0,0,0,0.4), inset 0 5px 10px rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.1); cursor: pointer; position: relative; transition: transform 0.2s; display: flex; justify-content: center; align-items: center; font-size: 24px; color: gold; text-shadow: 0 1px 2px black; }
+        .chk-piece:hover { transform: scale(1.1); }
+        .chk-piece.p1 { background: var(--plastic-red); border-color: #b71c1c; }
+        .chk-piece.p2 { background: #212121; border-color: #000; }
+        .chk-piece.selected { box-shadow: 0 0 0 4px #ffeb3b, 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
     </style>
 </head>
 <body>
     <div id="mode-modal">
         <div class="mode-card">
-            <div class="mode-title">Select Mode</div>
-            <div class="mode-btn-group">
+            <div class="mode-title" style="font-family:var(--font-fancy); font-size: 2rem; color:var(--accent-gold); margin-bottom: 20px;">Select Mode</div>
+            <div class="mode-btn-group" style="display:flex; gap:20px;">
                 <button class="btn" onclick="app.confirmMode(true)">Vs AI</button>
                 <button class="btn" onclick="app.confirmMode(false)">2 Players</button>
             </div>
@@ -225,149 +288,402 @@
             endTurn() { this.isPlayerTurn=!this.isPlayerTurn; if(this.gameOver)return; if(this.vsAI&&!this.isPlayerTurn){this.updateStatus("AI Thinking...");this.aiDelay(()=>this.makeAIMove());}else{this.updateStatus(this.isPlayerTurn?"Player 1":"Player 2");} }
         }
 
-        /* --- YAHTZEE ENGINE --- */
+        /* --- YAHTZEE ENGINE WITH PHYSICS --- */
         class Yahtzee extends BoardGame {
             init() {
-                this.dice = [1,1,1,1,1]; this.held = [false,false,false,false,false];
+                this.diceVals = [1,1,1,1,1];
+                this.heldDice = []; // Array of {id, val}
                 this.rollsLeft = 3; 
-                // Scores: 0-5 (1s-6s), 6:3ok, 7:4ok, 8:Full, 9:SmSt, 10:LgSt, 11:Yahtzee, 12:Chance
                 this.scores = { p1: Array(13).fill(null), p2: Array(13).fill(null) };
                 this.cats = ["Ones","Twos","Threes","Fours","Fives","Sixes","3 of Kind","4 of Kind","Full House","Sm. Straight","Lg. Straight","Yahtzee","Chance"];
-                this.renderLayout(); this.updateStatus(this.vsAI?"Your Turn (Rolls: 3)":"P1 Turn (Rolls: 3)");
+                this.isRolling = false;
+                
+                // Physics references
+                this.engine = null;
+                this.renderObj = null;
+                this.runner = null;
+                this.canvasW = 0; 
+                this.canvasH = 0;
+                
+                this.renderLayout();
+                this.updateStatus(this.vsAI?"Your Turn (Rolls: 3)":"P1 Turn (Rolls: 3)");
+            }
+
+            destroy() {
+                // Cleanup Physics
+                if(this.runner) Matter.Runner.stop(this.runner);
+                if(this.renderObj) Matter.Render.stop(this.renderObj);
+                if(this.engine) Matter.Engine.clear(this.engine);
+                if(this.renderObj && this.renderObj.canvas) this.renderObj.canvas.remove();
             }
 
             renderLayout() {
                 this.container.innerHTML = `
-                    <div class="yz-layout">
-                        <div class="yz-board">
-                            <div class="dice-container" id="yz-dice"></div>
-                            <button class="btn" id="yz-roll-btn" onclick="app.currentGame.rollDice()">Roll Dice</button>
+                    <div class="yz-main-container">
+                        <div class="yz-section-score">
+                            <div class="yz-sc-header">
+                                <div>Category</div><div style="text-align:center">P1</div><div style="text-align:center">${this.vsAI?'AI':'P2'}</div>
+                            </div>
+                            <div id="yz-score-rows"></div>
                         </div>
-                        <div class="yz-scorecard" id="yz-scorecard"></div>
+                        <div class="yz-section-game">
+                            <div class="yz-hold-rack" id="yz-hold-rack" ondragover="event.preventDefault()">
+                                </div>
+                            <div id="yz-canvas-wrapper">
+                                <div class="yz-controls">
+                                    <button class="btn" id="yz-roll-btn" onclick="app.currentGame.triggerRoll()">Roll Dice</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>`;
-                this.renderDice(); this.renderScorecard();
+                
+                this.renderScorecard();
+                this.initPhysics();
+                this.renderHoldRack();
             }
 
-            renderDice() {
-                const con = document.getElementById('yz-dice'); con.innerHTML='';
-                this.dice.forEach((val, i) => {
-                    const d = document.createElement('div');
-                    d.className = `die ${this.held[i]?'held':''}`;
-                    d.onclick = () => this.toggleHold(i);
-                    // Create faces
-                    let html = '';
-                    const dots = (n) => Array(n).fill('<div class="dot"></div>').join('');
-                    [1,2,3,4,5,6].forEach(f => {
-                        html += `<div class="die-face face-${f}">${dots(f)}</div>`;
+            initPhysics() {
+                const wrapper = document.getElementById('yz-canvas-wrapper');
+                this.canvasW = wrapper.clientWidth;
+                this.canvasH = wrapper.clientHeight;
+
+                this.engine = Matter.Engine.create();
+                this.engine.world.gravity.y = 0; // Top-down view, no gravity
+
+                this.renderObj = Matter.Render.create({
+                    element: wrapper,
+                    engine: this.engine,
+                    options: {
+                        width: this.canvasW,
+                        height: this.canvasH,
+                        background: 'transparent',
+                        wireframes: false,
+                        showAngleIndicator: false
+                    }
+                });
+
+                // Walls
+                const th = 50;
+                const wallOpts = { isStatic: true, render: { visible: false }, restitution: 0.9 };
+                Matter.World.add(this.engine.world, [
+                    Matter.Bodies.rectangle(this.canvasW/2, -th/2, this.canvasW, th, wallOpts),
+                    Matter.Bodies.rectangle(this.canvasW/2, this.canvasH+th/2, this.canvasW, th, wallOpts),
+                    Matter.Bodies.rectangle(this.canvasW+th/2, this.canvasH/2, th, this.canvasH, wallOpts),
+                    Matter.Bodies.rectangle(-th/2, this.canvasH/2, th, this.canvasH, wallOpts)
+                ]);
+
+                // Mouse interaction for dragging bodies on canvas (optional, maybe just click)
+                const mouse = Matter.Mouse.create(this.renderObj.canvas);
+                const mouseConstraint = Matter.MouseConstraint.create(this.engine, {
+                    mouse: mouse,
+                    constraint: { stiffness: 0.2, render: { visible: false } }
+                });
+                Matter.World.add(this.engine.world, mouseConstraint);
+
+                // Handle clicks on bodies to "Hold" them
+                Matter.Events.on(mouseConstraint, 'mousedown', (event) => {
+                    const body = event.source.body;
+                    if(body && body.label === 'die' && !this.isRolling && this.rollsLeft < 3) {
+                        this.holdDie(body.id);
+                    }
+                });
+
+                // Custom Rendering for Dice Faces
+                Matter.Events.on(this.renderObj, 'afterRender', () => {
+                    const ctx = this.renderObj.context;
+                    const bodies = Matter.Composite.allBodies(this.engine.world);
+                    
+                    bodies.forEach(body => {
+                        if (body.label === 'die') {
+                            const { x, y } = body.position;
+                            const size = 50;
+                            
+                            ctx.translate(x, y);
+                            ctx.rotate(body.angle);
+                            
+                            // Draw Die Base
+                            ctx.fillStyle = '#fdfdfd';
+                            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                            ctx.shadowBlur = 10;
+                            ctx.beginPath();
+                            ctx.roundRect(-size/2, -size/2, size, size, 8);
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+                            
+                            // Draw Pips
+                            ctx.fillStyle = '#222';
+                            this.drawPips(ctx, body.val, size);
+                            
+                            // Draw Border
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = '#ccc';
+                            ctx.stroke();
+
+                            ctx.rotate(-body.angle);
+                            ctx.translate(-x, -y);
+                        }
                     });
-                    d.innerHTML = html;
-                    // Rotate to show value
-                    const rot = {1:[0,0], 2:[0,180], 3:[0,-90], 4:[0,90], 5:[-90,0], 6:[90,0]};
-                    d.style.transform = `rotateX(${rot[val][0]}deg) rotateY(${rot[val][1]}deg)`;
-                    con.appendChild(d);
+                });
+
+                this.runner = Matter.Runner.create();
+                Matter.Runner.run(this.runner, this.engine);
+                Matter.Render.run(this.renderObj);
+                
+                // Re-size listener
+                window.addEventListener('resize', () => {
+                    if(!document.getElementById('yz-canvas-wrapper')) return;
+                    this.canvasW = wrapper.clientWidth;
+                    this.canvasH = wrapper.clientHeight;
+                    this.renderObj.canvas.width = this.canvasW;
+                    this.renderObj.canvas.height = this.canvasH;
+                    // Note: Walls won't resize in this simple version, reset helps
                 });
             }
 
-            renderScorecard() {
-                const sc = document.getElementById('yz-scorecard');
-                let html = `<div style="display:grid; grid-template-columns: 2fr 1fr 1fr; font-weight:bold; border-bottom:2px solid #333; margin-bottom:5px;"><div>Cat</div><div>P1</div><div>${this.vsAI?'AI':'P2'}</div></div>`;
+            drawPips(ctx, val, size) {
+                const s = size/2; 
+                const q = s/2; // quarter
+                const r = 5; // pip radius
+                const drawDot = (x,y) => { ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); };
                 
-                this.cats.forEach((cat, i) => {
-                    const s1 = this.scores.p1[i], s2 = this.scores.p2[i];
-                    // If current player turn and slot empty, clickable
-                    const p1Click = (this.isPlayerTurn && s1===null && this.rollsLeft<3) ? `onclick="app.currentGame.score(${i})"` : '';
-                    const p2Click = (!this.isPlayerTurn && !this.vsAI && s2===null && this.rollsLeft<3) ? `onclick="app.currentGame.score(${i})"` : '';
+                if(val===1 || val===3 || val===5) drawDot(0,0);
+                if(val>=2) { drawDot(-q,-q); drawDot(q,q); }
+                if(val>=4) { drawDot(q,-q); drawDot(-q,q); }
+                if(val===6) { drawDot(-q,0); drawDot(q,0); }
+            }
+
+            triggerRoll() {
+                if(this.rollsLeft <= 0 || this.isRolling) return;
+                
+                // AI Logic gate
+                if(this.vsAI && !this.isPlayerTurn) return;
+
+                this.performRoll();
+            }
+
+            performRoll() {
+                this.rollsLeft--;
+                this.isRolling = true;
+                
+                // Clear existing bodies except walls
+                const bodies = Matter.Composite.allBodies(this.engine.world);
+                const diceBodies = bodies.filter(b => b.label === 'die');
+                Matter.World.remove(this.engine.world, diceBodies);
+
+                // Spawn new dice (5 - held count)
+                const count = 5 - this.heldDice.length;
+                const newBodies = [];
+                
+                for(let i=0; i<count; i++) {
+                    const x = this.canvasW/2 + (Math.random()*40 - 20);
+                    const y = this.canvasH/2 + (Math.random()*40 - 20);
+                    const body = Matter.Bodies.rectangle(x, y, 50, 50, { 
+                        label: 'die',
+                        restitution: 0.6,
+                        friction: 0.1,
+                        frictionAir: 0.02,
+                        chamfer: { radius: 8 }
+                    });
                     
-                    html += `
-                    <div class="yz-row ${s1!==null&&this.isPlayerTurn?'filled':''}">
-                        <div class="yz-cat">${cat}</div>
-                        <div class="yz-val" ${p1Click} style="${p1Click?'cursor:pointer;background:#e3f2fd':''}">${s1===null?'-':s1}</div>
-                        <div class="yz-val" ${p2Click} style="${p2Click?'cursor:pointer;background:#e3f2fd':''}">${s2===null?'-':s2}</div>
-                    </div>`;
+                    // Initial violent force
+                    Matter.Body.setVelocity(body, { x: (Math.random()-0.5)*30, y: (Math.random()-0.5)*30 });
+                    Matter.Body.setAngularVelocity(body, (Math.random()-0.5)*0.5);
+                    
+                    body.val = Math.floor(Math.random()*6)+1; // Target value
+                    newBodies.push(body);
+                }
+                
+                Matter.World.add(this.engine.world, newBodies);
+
+                // Animation Phase
+                let frames = 0;
+                const animInterval = setInterval(() => {
+                    frames++;
+                    newBodies.forEach(b => {
+                        // Randomize face while moving fast
+                        if (b.speed > 0.5) b.val = Math.floor(Math.random()*6)+1;
+                    });
+                    
+                    if (frames > 40 && frames % 10 === 0) {
+                        // Check if stopped
+                        const allStopped = newBodies.every(b => b.speed < 0.2 && b.angularSpeed < 0.1);
+                        if(allStopped || frames > 150) {
+                            clearInterval(animInterval);
+                            this.isRolling = false;
+                            this.finalizeRoll(newBodies);
+                        }
+                    }
+                }, 30);
+            }
+
+            finalizeRoll(bodies) {
+                // Ensure final values are set
+                this.diceVals = [];
+                
+                // Add held values
+                this.heldDice.forEach(d => this.diceVals.push(d.val));
+                
+                // Add board values
+                bodies.forEach(b => {
+                    b.val = Math.floor(Math.random()*6)+1; // Final determination
+                    this.diceVals.push(b.val);
+                });
+                
+                this.updateUI();
+                
+                // Trigger AI logic if needed
+                if(this.vsAI && !this.isPlayerTurn) {
+                    if (this.rollsLeft > 0) this.aiDelay(()=>this.aiRollLogic());
+                    else this.aiDelay(()=>this.aiScoreLogic());
+                }
+            }
+
+            holdDie(bodyId) {
+                const body = Matter.Composite.get(this.engine.world, bodyId, 'body');
+                if(!body) return;
+                
+                // Add to held array
+                this.heldDice.push({ id: 'd'+Date.now(), val: body.val });
+                
+                // Remove from physics world
+                Matter.World.remove(this.engine.world, body);
+                
+                this.renderHoldRack();
+                this.updateUI();
+            }
+
+            unholdDie(idx) {
+                if(this.vsAI && !this.isPlayerTurn) return; // Prevent player messing with AI
+                
+                this.heldDice.splice(idx, 1);
+                // Note: The die disappears from rack. It will reappear on canvas NEXT roll.
+                this.renderHoldRack();
+            }
+            
+            // Drag and Drop Logic for Hold Rack
+            renderHoldRack() {
+                const rack = document.getElementById('yz-hold-rack');
+                rack.innerHTML = '';
+                
+                // Create slots based on Held Dice
+                this.heldDice.forEach((d, i) => {
+                    const slot = document.createElement('div');
+                    slot.className = 'yz-hold-slot';
+                    
+                    const die = document.createElement('div');
+                    die.className = 'yz-die-dom pips-'+d.val;
+                    die.draggable = true;
+                    die.innerHTML = Array(6).fill('<div class="pip"></div>').join('');
+                    die.onclick = () => this.unholdDie(i);
+                    
+                    // Drag Events
+                    die.ondragstart = (e) => { e.dataTransfer.setData('idx', i); };
+                    slot.ondragover = (e) => { e.preventDefault(); };
+                    slot.ondrop = (e) => {
+                        e.preventDefault();
+                        const fromIdx = parseInt(e.dataTransfer.getData('idx'));
+                        this.reorderHeld(fromIdx, i);
+                    };
+                    
+                    slot.appendChild(die);
+                    rack.appendChild(slot);
+                });
+
+                // Add empty slots just for visuals if rack not full
+                for(let k=this.heldDice.length; k<5; k++) {
+                    const s = document.createElement('div'); s.className='yz-hold-slot';
+                    s.style.opacity='0.3';
+                    rack.appendChild(s);
+                }
+            }
+
+            reorderHeld(from, to) {
+                if(from === to) return;
+                const item = this.heldDice.splice(from, 1)[0];
+                this.heldDice.splice(to, 0, item);
+                this.renderHoldRack();
+            }
+
+            updateUI() {
+                const pName = this.isPlayerTurn ? "P1" : (this.vsAI?"AI":"P2");
+                const rTxt = this.rollsLeft === 0 ? "Select Score" : `Rolls: ${this.rollsLeft}`;
+                this.updateStatus(`${pName} (${rTxt})`);
+                this.renderScorecard();
+            }
+
+            renderScorecard() {
+                const con = document.getElementById('yz-score-rows');
+                con.innerHTML = '';
+                
+                // Calculate Potentials if it's the player's turn to score
+                const currentVals = [];
+                // Combine held and physics bodies for calculation
+                this.heldDice.forEach(d => currentVals.push(d.val));
+                Matter.Composite.allBodies(this.engine.world).forEach(b => { if(b.label==='die') currentVals.push(b.val); });
+                
+                const showPotential = !this.isRolling && (this.rollsLeft < 3 || currentVals.length===5);
+
+                this.cats.forEach((cat, i) => {
+                    const s1 = this.scores.p1[i];
+                    const s2 = this.scores.p2[i];
+                    const row = document.createElement('div');
+                    row.className = 'yz-sc-row';
+                    
+                    // Potentials
+                    let potVal = null;
+                    if(showPotential && ((this.isPlayerTurn && s1===null) || (!this.isPlayerTurn && !this.vsAI && s2===null))) {
+                        potVal = this.calcScore(i, currentVals);
+                    }
+
+                    // P1 Cell
+                    let p1Html = s1 !== null ? s1 : (this.isPlayerTurn && potVal!==null ? potVal : '');
+                    let p1Class = `yz-sc-val p1-col ${s1!==null?'locked':(this.isPlayerTurn && potVal!==null?'active-turn':'')}`;
+                    
+                    // P2 Cell
+                    let p2Html = s2 !== null ? s2 : (!this.isPlayerTurn && !this.vsAI && potVal!==null ? potVal : '');
+                    let p2Class = `yz-sc-val p2-col ${s2!==null?'locked':(!this.isPlayerTurn && !this.vsAI && potVal!==null?'active-turn':'')}`;
+
+                    row.innerHTML = `
+                        <div class="yz-sc-cat">${cat}</div>
+                        <div class="${p1Class}" id="p1-c-${i}">${p1Html}</div>
+                        <div class="${p2Class}" id="p2-c-${i}">${p2Html}</div>
+                    `;
+                    
+                    // Click Events
+                    if(this.isPlayerTurn && s1===null && potVal!==null) {
+                        row.querySelector('#p1-c-'+i).onclick = () => this.confirmScore(i, potVal);
+                    } else if (!this.isPlayerTurn && !this.vsAI && s2===null && potVal!==null) {
+                        row.querySelector('#p2-c-'+i).onclick = () => this.confirmScore(i, potVal);
+                    }
+                    
+                    con.appendChild(row);
                 });
                 
                 // Totals
                 const sum = (arr) => arr.reduce((a,b)=>a+(b||0),0);
-                html += `<div class="yz-row total"><div>Total</div><div>${sum(this.scores.p1)}</div><div>${sum(this.scores.p2)}</div></div>`;
-                sc.innerHTML = html;
+                const tRow = document.createElement('div');
+                tRow.className='yz-sc-row'; tRow.style.background='#333'; tRow.style.color='#fff';
+                tRow.innerHTML=`<div>TOTAL</div><div>${sum(this.scores.p1)}</div><div>${sum(this.scores.p2)}</div>`;
+                con.appendChild(tRow);
             }
 
-            toggleHold(i) {
-                if(this.rollsLeft === 3) return; // Must roll once
-                if(this.vsAI && !this.isPlayerTurn) return; // AI turn
-                this.held[i] = !this.held[i];
-                this.renderDice();
-            }
-
-            rollDice() {
-                if(this.rollsLeft <= 0) return;
-                this.rollsLeft--;
-                const diceEls = document.querySelectorAll('.die');
-                
-                // Anim
-                this.dice.forEach((v, i) => {
-                    if(!this.held[i]) {
-                        diceEls[i].classList.add('rolling');
-                        this.dice[i] = Math.ceil(Math.random()*6);
-                    }
-                });
-
-                setTimeout(() => {
-                    diceEls.forEach(d => d.classList.remove('rolling'));
-                    this.renderDice();
-                    this.renderScorecard();
-                    
-                    const pName = this.isPlayerTurn ? "P1" : (this.vsAI?"AI":"P2");
-                    if(this.rollsLeft===0) this.updateStatus(`${pName}: Select Score`);
-                    else this.updateStatus(`${pName} (Rolls: ${this.rollsLeft})`);
-                    
-                    if(this.vsAI && !this.isPlayerTurn && this.rollsLeft > 0) {
-                        this.aiDelay(()=>this.aiRollLogic());
-                    } else if (this.vsAI && !this.isPlayerTurn && this.rollsLeft === 0) {
-                        this.aiDelay(()=>this.aiScoreLogic());
-                    }
-
-                }, 500);
-            }
-
-            score(catIdx) {
-                const arr = this.dice;
+            calcScore(catIdx, dice) {
+                if(dice.length === 0) return 0;
                 let val = 0;
-                const counts = [0,0,0,0,0,0,0]; arr.forEach(x=>counts[x]++);
-                const sum = arr.reduce((a,b)=>a+b,0);
+                const counts = [0,0,0,0,0,0,0]; dice.forEach(x=>counts[x]++);
+                const sum = dice.reduce((a,b)=>a+b,0);
                 
-                // Scoring Logic
-                if(catIdx < 6) { val = counts[catIdx+1] * (catIdx+1); } // Upper
-                else if(catIdx===6) { if(counts.some(x=>x>=3)) val = sum; } // 3ofK
-                else if(catIdx===7) { if(counts.some(x=>x>=4)) val = sum; } // 4ofK
-                else if(catIdx===8) { if(counts.includes(3)&&counts.includes(2) || counts.includes(5)) val=25; } // Full House
-                else if(catIdx===9) { if(this.checkStraight(counts)>=4) val=30; } // Sm Str
-                else if(catIdx===10) { if(this.checkStraight(counts)>=5) val=40; } // Lg Str
-                else if(catIdx===11) { if(counts.includes(5)) val=50; } // Yahtzee
-                else if(catIdx===12) { val = sum; } // Chance
-
-                const p = this.isPlayerTurn ? 'p1' : 'p2';
-                this.scores[p][catIdx] = val;
-                
-                // Reset Turn
-                this.held = [false,false,false,false,false];
-                this.rollsLeft = 3;
-                this.dice = [1,1,1,1,1];
-                this.renderLayout();
-                
-                // Check Game Over
-                if(!this.scores.p1.includes(null) && !this.scores.p2.includes(null)) {
-                    this.gameOver = true;
-                    const s1 = this.scores.p1.reduce((a,b)=>a+b,0);
-                    const s2 = this.scores.p2.reduce((a,b)=>a+b,0);
-                    this.updateStatus(`Game Over! P1:${s1} ${this.vsAI?'AI':'P2'}:${s2}`);
-                } else {
-                    this.endTurn();
-                    // If AI turn start
-                    if(this.vsAI && !this.isPlayerTurn) this.aiDelay(()=>this.rollDice());
-                }
+                if(catIdx < 6) { val = counts[catIdx+1] * (catIdx+1); }
+                else if(catIdx===6) { if(counts.some(x=>x>=3)) val = sum; }
+                else if(catIdx===7) { if(counts.some(x=>x>=4)) val = sum; }
+                else if(catIdx===8) { if((counts.includes(3)&&counts.includes(2)) || counts.includes(5)) val=25; }
+                else if(catIdx===9) { if(this.checkStraight(counts)>=4) val=30; }
+                else if(catIdx===10) { if(this.checkStraight(counts)>=5) val=40; }
+                else if(catIdx===11) { if(counts.includes(5)) val=50; }
+                else if(catIdx===12) { val = sum; }
+                return val;
             }
-            
+
             checkStraight(counts) {
                 let seq = 0, max = 0;
                 for(let i=1; i<=6; i++) {
@@ -377,54 +693,96 @@
                 return max;
             }
 
-            // AI Logic
+            confirmScore(idx, val) {
+                const p = this.isPlayerTurn ? 'p1' : 'p2';
+                this.scores[p][idx] = val;
+                
+                // Reset Round
+                this.heldDice = [];
+                this.rollsLeft = 3;
+                this.diceVals = [];
+                Matter.World.clear(this.engine.world); // clear board
+                Matter.World.add(this.engine.world, [ // Add walls back
+                    Matter.Bodies.rectangle(this.canvasW/2, -25, this.canvasW, 50, {isStatic:true}),
+                    Matter.Bodies.rectangle(this.canvasW/2, this.canvasH+25, this.canvasW, 50, {isStatic:true}),
+                    Matter.Bodies.rectangle(this.canvasW+25, this.canvasH/2, 50, this.canvasH, {isStatic:true}),
+                    Matter.Bodies.rectangle(-25, this.canvasH/2, 50, this.canvasH, {isStatic:true})
+                ]);
+                this.renderHoldRack();
+
+                // Check Game Over
+                if(!this.scores.p1.includes(null) && !this.scores.p2.includes(null)) {
+                    this.gameOver = true;
+                    const s1 = this.scores.p1.reduce((a,b)=>a+(b||0),0);
+                    const s2 = this.scores.p2.reduce((a,b)=>a+(b||0),0);
+                    let res = "Tie!";
+                    if(s1>s2) res = "P1 Wins!";
+                    if(s2>s1) res = (this.vsAI?"AI Wins!":"P2 Wins!");
+                    this.updateStatus(`Game Over! ${res} (${s1}-${s2})`);
+                    this.renderScorecard();
+                } else {
+                    this.endTurn();
+                    // AI Turn trigger logic is handled in endTurn() base class, 
+                    // but we need to override the start action
+                    if(this.vsAI && !this.isPlayerTurn) {
+                        this.aiDelay(()=>this.performRoll());
+                    }
+                }
+            }
+
+            // --- AI LOGIC ---
             aiRollLogic() {
-                // Simple Heuristic: If we have 3+ of a kind, hold them.
-                const counts = [0,0,0,0,0,0,0]; this.dice.forEach(x=>counts[x]++);
+                // Get current visible dice
+                const dice = [];
+                this.heldDice.forEach(d => dice.push(d.val));
+                Matter.Composite.allBodies(this.engine.world).forEach(b => { if(b.label==='die') dice.push(b.val); });
+                
+                // Strategy: Keep max of a kind
+                const counts = [0,0,0,0,0,0,0]; dice.forEach(x=>counts[x]++);
                 const maxCount = Math.max(...counts);
-                const val = counts.indexOf(maxCount); // Value of the dice we have most of
+                const targetVal = counts.indexOf(maxCount);
+
+                // Hold Strategy: 
+                // 1. If 3+ of kind, keep them.
+                // 2. If straight potential (implement later), currently simple.
                 
-                // Logic: Hold dice that match the most common value
-                this.dice.forEach((d, i) => {
-                    if(maxCount >= 2 && d === val) this.held[i] = true;
-                    else this.held[i] = false;
+                // Move physics bodies to hold if they match target
+                const bodies = Matter.Composite.allBodies(this.engine.world).filter(b=>b.label==='die');
+                bodies.forEach(b => {
+                    if(b.val === targetVal && maxCount >= 2) {
+                        this.holdDie(b.id);
+                    }
                 });
-                
-                this.renderDice();
-                this.aiDelay(()=>this.rollDice());
+
+                this.aiDelay(()=>this.performRoll());
             }
 
             aiScoreLogic() {
-                // Find best open slot
+                const dice = [];
+                this.heldDice.forEach(d => dice.push(d.val));
+                Matter.Composite.allBodies(this.engine.world).forEach(b => { if(b.label==='die') dice.push(b.val); });
+
                 const openSlots = this.scores.p2.map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
-                // Simulate score for each open slot
                 let bestSlot = openSlots[0];
                 let bestScore = -1;
                 
                 openSlots.forEach(idx => {
-                    // Reuse score logic partially or duplicate calc
-                    // Quick calc
-                    let s = 0;
-                    const arr = this.dice;
-                    const counts = [0,0,0,0,0,0,0]; arr.forEach(x=>counts[x]++);
-                    const sum = arr.reduce((a,b)=>a+b,0);
-                    if(idx<6) s = counts[idx+1]*(idx+1);
-                    else if(idx===6 && counts.some(x=>x>=3)) s=sum;
-                    else if(idx===7 && counts.some(x=>x>=4)) s=sum;
-                    else if(idx===8 && ((counts.includes(3)&&counts.includes(2))||counts.includes(5))) s=25;
-                    else if(idx===9 && this.checkStraight(counts)>=4) s=30;
-                    else if(idx===10 && this.checkStraight(counts)>=5) s=40;
-                    else if(idx===11 && counts.includes(5)) s=50;
-                    else if(idx===12) s=sum;
+                    const s = this.calcScore(idx, dice);
+                    // Weighting: Prefer filling bottom section if high score
+                    let weight = s;
+                    if(idx >= 6 && s === 0) weight = -10; // Avoid scratching bottom unless necessary
                     
-                    if(s > bestScore) { bestScore = s; bestSlot = idx; }
+                    if(weight > bestScore) { bestScore = weight; bestSlot = idx; }
                 });
-                
-                this.score(bestSlot);
+
+                // Fail safe
+                if(bestScore === -1 && openSlots.length > 0) bestSlot = openSlots[0];
+
+                this.confirmScore(bestSlot, this.calcScore(bestSlot, dice));
             }
         }
 
-        /* --- CONNECT FOUR (New Physics) --- */
+        /* --- CONNECT FOUR --- */
         class ConnectFour extends BoardGame {
             init() {
                 this.rows=6; this.cols=7; this.board=Array(6).fill().map(()=>Array(7).fill(null));
@@ -441,10 +799,8 @@
                 let r=-1; for(let i=5;i>=0;i--)if(!this.board[i][c]){r=i;break;}
                 if(r===-1)return;
                 const col=this.isPlayerTurn?'red':'yellow'; this.board[r][c]=col;
-                // Animation Logic
                 const p=document.createElement('div'); p.className=`c4-piece ${col} falling`;
                 p.style.left=`${c*70+5}px`; 
-                // Top dest is (r*70 + 5) inside the container. Since piece starts at -70, total travel is (r*70 + 5 + 70)
                 p.style.setProperty('--dest', `${r*70+5+70}px`);
                 document.getElementById('c4-pieces').appendChild(p);
                 
@@ -454,12 +810,15 @@
             makeAIMove(){
                 let m=this.bestMove('yellow')||this.bestMove('red')||Math.floor(Math.random()*7);
                 let r=-1;for(let i=5;i>=0;i--)if(!this.board[i][m]){r=i;break;}
+                // Fallback if column full
+                if(r===-1) { m = [0,1,2,3,4,5,6].find(c=>!this.board[0][c]); r=-1;for(let i=5;i>=0;i--)if(!this.board[i][m]){r=i;break;} }
+                
                 if(r!==-1){this.board[r][m]='yellow'; const p=document.createElement('div'); p.className=`c4-piece yellow falling`; p.style.left=`${m*70+5}px`; p.style.setProperty('--dest', `${r*70+5+70}px`); document.getElementById('c4-pieces').appendChild(p); if(this.check(r,m,'yellow')){this.gameOver=true;this.updateStatus("AI Wins!");}else this.endTurn();}
             }
             bestMove(k){for(let c=0;c<7;c++){if(this.board[0][c])continue;let r=-1;for(let i=5;i>=0;i--)if(!this.board[i][c]){r=i;break;}this.board[r][c]=k;if(this.check(r,c,k)){this.board[r][c]=null;return c;}this.board[r][c]=null;}return null;}
         }
 
-        /* --- CHESS (Shortened for space) --- */
+        /* --- CHESS --- */
         class Chess extends BoardGame {
             init() {
                 const s=[['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']];
@@ -505,13 +864,16 @@
             }
         }
 
-        /* --- OTHER GAMES (TicTacToe / Checkers / Reversi) --- */
+        /* --- TIC TAC TOE --- */
         class TicTacToe extends BoardGame{init(){this.b=Array(9).fill(null);this.render();this.updateStatus(this.vsAI?"Your Turn (X)":"Player 1 (X)");}render(){this.container.innerHTML='<div class="ttt-board"></div>';const el=this.container.querySelector('.ttt-board');for(let i=0;i<9;i++){const d=document.createElement('div');d.className='ttt-cell';d.onclick=()=>this.mv(i);el.appendChild(d);}}mv(i){if(this.b[i]||this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;const p=this.isPlayerTurn?'X':'O';this.b[i]=p;this.container.querySelectorAll('.ttt-cell')[i].innerHTML=`<div class="ttt-piece ${p.toLowerCase()}">${p}</div>`;if(this.chk(p)){this.gameOver=true;this.updateStatus(p+" Wins");return;}if(!this.b.includes(null)){this.gameOver=true;this.updateStatus("Draw");return;}this.endTurn();}makeAIMove(){let m;let best=-Infinity;for(let i=0;i<9;i++)if(!this.b[i]){this.b[i]='O';let s=this.mm(this.b,0,false);this.b[i]=null;if(s>best){best=s;m=i;}}this.b[m]='O';this.container.querySelectorAll('.ttt-cell')[m].innerHTML=`<div class="ttt-piece o">O</div>`;if(this.chk('O')){this.gameOver=true;this.updateStatus("AI Wins");}else if(!this.b.includes(null)){this.gameOver=true;this.updateStatus("Draw");}else this.endTurn();}chk(p){const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return w.some(c=>this.b[c[0]]===p&&this.b[c[1]]===p&&this.b[c[2]]===p);}mm(b,d,isM){if(this.chk('O'))return 10-d;if(this.chk('X'))return d-10;if(!b.includes(null))return 0;if(isM){let v=-Infinity;for(let i=0;i<9;i++)if(!b[i]){b[i]='O';v=Math.max(v,this.mm(b,d+1,false));b[i]=null;}return v;}else{let v=Infinity;for(let i=0;i<9;i++)if(!b[i]){b[i]='X';v=Math.min(v,this.mm(b,d+1,true));b[i]=null;}return v;}}}
 
+        /* --- REVERSI --- */
         class Reversi extends BoardGame{init(){this.b=Array(8).fill().map(()=>Array(8).fill(0));this.b[3][3]=2;this.b[3][4]=1;this.b[4][3]=1;this.b[4][4]=2;this.mvs=[];this.render();this.upd();this.updateStatus(this.vsAI?"Your Turn (Black)":"Black's Turn");}render(){this.container.innerHTML='<div class="reversi-board"></div>';const el=this.container.querySelector('.reversi-board');this.dom=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=document.createElement('div');d.className='reversi-cell';d.onclick=()=>this.mv(r,c);const ch=document.createElement('div');ch.className='reversi-chip';ch.innerHTML='<div class="chip-face chip-front"></div><div class="chip-face chip-back"></div>';d.appendChild(ch);el.appendChild(d);this.dom.push({el:d,ch,r,c});}}upd(){this.dom.forEach(o=>{const v=this.b[o.r][o.c];o.ch.style.display=v?'block':'none';if(v)o.ch.className=`reversi-chip ${v===1?'black':'white'}`;o.el.classList.remove('legal-move');});const p=this.isPlayerTurn?1:2;this.mvs=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(!this.b[r][c]){const f=this.getFlips(r,c,p);if(f.length){this.mvs.push({r,c,f});this.dom[r*8+c].el.classList.add('legal-move');}}if(!this.mvs.length&&!this.gameOver){let any=false;for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(!this.b[r][c]&&this.getFlips(r,c,p===1?2:1).length)any=true;if(!any){this.gameOver=true;let b=0,w=0;this.b.forEach(r=>r.forEach(v=>{if(v===1)b++;if(v===2)w++;}));this.updateStatus(`Game Over! B:${b} W:${w}`);}else{this.endTurn();setTimeout(()=>this.upd(),500);}}}mv(r,c){if(this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;const m=this.mvs.find(o=>o.r===r&&o.c===c);if(!m)return;const p=this.isPlayerTurn?1:2;this.b[r][c]=p;m.f.forEach(f=>this.b[f.r][f.c]=p);this.endTurn();this.upd();}getFlips(r,c,p){const op=p===1?2:1,d=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]],f=[];d.forEach(([dr,dc])=>{let tr=r+dr,tc=c+dc,pot=[];while(tr>=0&&tr<8&&tc>=0&&tc<8){if(this.b[tr][tc]===op)pot.push({r:tr,c:tc});else if(this.b[tr][tc]===p){f.push(...pot);break;}else break;tr+=dr;tc+=dc;}});return f;}makeAIMove(){if(!this.mvs.length)return;const w=[[100,-20,10,5,5,10,-20,100],[-20,-50,-2,-2,-2,-2,-50,-20],[10,-2,-1,-1,-1,-1,-2,10],[5,-2,-1,-1,-1,-1,-2,5],[5,-2,-1,-1,-1,-1,-2,5],[10,-2,-1,-1,-1,-1,-2,10],[-20,-50,-2,-2,-2,-2,-50,-20],[100,-20,10,5,5,10,-20,100]];let best=this.mvs[0],max=-Infinity;this.mvs.forEach(m=>{let s=w[m.r][m.c]+m.f.length;if(s>max){max=s;best=m;}});this.mv(best.r,best.c);}}
 
+        /* --- CHECKERS --- */
         class Checkers extends BoardGame{init(){this.b=Array(8).fill().map(()=>Array(8).fill(null));for(let r=0;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2){if(r<3)this.b[r][c]={p:2,k:0};if(r>4)this.b[r][c]={p:1,k:0};}this.sel=null;this.mvs=[];this.render();this.updateStatus(this.vsAI?"Your Turn (Red)":"Red's Turn");}render(){this.container.innerHTML='<div class="checkers-board"></div>';const el=this.container.querySelector('.checkers-board');this.dom=[];for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){const d=document.createElement('div');d.className=`chk-cell ${(r+c)%2?'dark':'light'}`;d.onclick=()=>this.clk(r,c);el.appendChild(d);row.push(d);}this.dom.push(row);}this.draw();}draw(){this.dom.forEach(r=>r.forEach(c=>{c.innerHTML='';c.classList.remove('highlight');}));for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=this.b[r][c];if(p){const d=document.createElement('div');d.className=`chk-piece p${p.p} ${p.k?'king':''}`;d.innerHTML=p.k?'♛':'';if(this.sel?.r===r&&this.sel?.c===c)d.classList.add('selected');this.dom[r][c].appendChild(d);}}this.mvs.forEach(m=>this.dom[m.r][m.c].classList.add('highlight'));}clk(r,c){if(this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;const p=this.b[r][c],me=this.isPlayerTurn?1:2;if(p&&p.p===me){this.sel={r,c};this.mvs=this.getMvs(r,c,this.b);this.draw();return;}if(this.sel){const m=this.mvs.find(mv=>mv.r===r&&mv.c===c);if(m)this.exec(this.sel,m);else{this.sel=null;this.mvs=[];this.draw();}}}getMvs(r,c,b){const p=b[r][c],m=[];if(!p)return[];const d=p.k?[[-1,-1],[-1,1],[1,-1],[1,1]]:(p.p===1?[[-1,-1],[-1,1]]:[[1,-1],[1,1]]);d.forEach(([dr,dc])=>{if(b[r+dr]?.[c+dc]===null)m.push({r:r+dr,c:c+dc});if(b[r+dr*2]?.[c+dc*2]===null&&b[r+dr]?.[c+dc]&&b[r+dr][c+dc].p!==p.p)m.push({r:r+dr*2,c:c+dc*2,k:{r:r+dr,c:c+dc}});});return m;}exec(f,t){const p=this.b[f.r][f.c];this.b[t.r][t.c]=p;this.b[f.r][f.c]=null;if((p.p===1&&t.r===0)||(p.p===2&&t.r===7))p.k=1;if(t.k)this.b[t.k.r][t.k.c]=null;this.sel=null;this.mvs=[];this.draw();let c1=0,c2=0;this.b.forEach(r=>r.forEach(p=>{if(p){if(p.p===1)c1++;else c2++;}}));if(!c1||!c2){this.gameOver=true;this.updateStatus(c2===0?"Red Wins":"Black Wins");}else this.endTurn();}makeAIMove(){let all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.b[r][c]?.p===2)this.getMvs(r,c,this.b).forEach(t=>all.push({f:{r,c},t}));if(!all.length){this.gameOver=true;this.updateStatus("Red Wins");return;}const j=all.filter(m=>m.t.k);const mv=j.length?j[Math.floor(Math.random()*j.length)]:all[Math.floor(Math.random()*all.length)];this.exec(mv.f,mv.t);}}
 
+        /* --- APP CONTROLLER --- */
         const app = {
             currentGame: null, pendingGame: null,
             games: [
@@ -521,7 +883,6 @@
                 {id:'ttt',name:'Tic Tac Toe',icon:'❌',active:true,class:TicTacToe},
                 {id:'checkers',name:'Checkers',icon:'🏁',active:true,class:Checkers},
                 {id:'reversi',name:'Reversi',icon:'⚫',active:true,class:Reversi},
-                {id:'backgammon',name:'Backgammon',icon:'🎲',active:false},
             ],
             init() {
                 const g=document.getElementById('game-grid');
@@ -540,10 +901,14 @@
                 this.currentGame=new g.class(document.getElementById('game-board-container'),document.getElementById('game-status'),ai);
             },
             returnToHub() {
+                if(this.currentGame && this.currentGame.destroy) this.currentGame.destroy();
                 document.getElementById('active-game-container').classList.remove('visible');
                 setTimeout(()=>{const h=document.getElementById('game-hub'); h.style.display='flex'; setTimeout(()=>h.style.opacity='1',10); this.currentGame=null; document.getElementById('game-board-container').innerHTML='';},600);
             },
-            resetCurrentGame() { if(this.currentGame)this.currentGame.init(); }
+            resetCurrentGame() { 
+                if(this.currentGame && this.currentGame.destroy) this.currentGame.destroy();
+                if(this.currentGame) this.currentGame.init(); 
+            }
         };
         app.init();
     </script>
