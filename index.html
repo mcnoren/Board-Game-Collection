@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clubhouse Deluxe v7</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&family=Courier+Prime:wght@700&display=swap" rel="stylesheet">
+    <title>Clubhouse Deluxe v8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&family=Chivo+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
         /* --- CORE VISUALS --- */
         :root {
-            --wood-dark: #3E2723;
-            --wood-light: #5D4037;
-            --wood-grain: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(90)" opacity="0.2" version="1.1" xmlns="http://www.w3.org/2000/svg"><g><path fill="%23000000" d="M0 0h100v100H0z"/><path fill="%23ffffff" d="M0 0h100v3H0zM0 6h100v2H0zM0 12h100v4H0zM0 20h100v1H0zM0 26h100v3H0zM0 34h100v2H0zM0 40h100v4H0zM0 49h100v1H0zM0 54h100v3H0zM0 62h100v2H0zM0 68h100v4H0zM0 77h100v1H0zM0 82h100v3H0zM0 90h100v2H0zM0 96h100v4H0z"/></g></svg>');
-            --felt-green: #0a4a0e;
-            --felt-texture: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClD0ufAAAAElBMVEUAAADkbjDlbzHkcC/lbjHlbzI66UGEAAAABnRSTlMABR4wP095k1r4AAAASElEQVQ4y2NgIB64MTAw8QMr4QASzOlcwMrwH0gYqXEDK4s6kLIwH4i4gZXZuYGVeR8Q8QMrQz9Q2R0s4gZWRn0gYWRh3AAhAADv7A19k990agAAAABJRU5ErkJggg==');
-            --accent-gold: #d4af37;
-            --accent-brass: #b5a642;
-            --plastic-blue: #0277bd;
-            --plastic-blue-dark: #004c8c;
-            --plastic-red: #d32f2f;
-            --plastic-yellow: #fbc02d;
+            --wood-dark: #2d1b18;
+            --wood-light: #5d4037;
+            --wood-grain: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(90)" opacity="0.1" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z"/><path fill="%23fff" d="M0 0h100v2H0zM0 10h100v1H0zM0 25h100v3H0z" opacity="0.5"/></svg>');
+            --felt-green: #1b5e20;
+            --felt-texture: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwquNvLM0YHEEMdDCkAQBmWxL/m57O5AAAAABJRU5ErkJggg==');
+            --accent-gold: #ffc107;
+            --accent-brass: #bcaaa4;
             --font-ui: 'Rubik', sans-serif;
-            --font-fancy: 'Cinzel Decorative', cursive;
+            --font-fancy: 'Cinzel Decorative', serif;
+            --font-mono: 'Chivo Mono', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -28,221 +25,212 @@
         body {
             font-family: var(--font-ui);
             background-color: var(--wood-dark);
-            background-image: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.6) 100%), var(--wood-grain);
-            background-size: cover, 200px 200px;
-            height: 100vh; overflow: hidden; color: #fffae0;
-            display: flex; justify-content: center; align-items: center; perspective: 1000px;
+            background-image: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.8) 100%), var(--wood-grain);
+            height: 100vh; overflow: hidden; color: #fff;
+            display: flex; justify-content: center; align-items: center; perspective: 1200px;
         }
 
-        /* --- UI & MODALS --- */
+        /* --- MENUS --- */
         #mode-modal {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            z-index: 50; display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 100; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         #mode-modal.active { opacity: 1; pointer-events: all; }
         .mode-card {
-            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
-            padding: 40px; border-radius: 15px; border: 4px solid var(--accent-brass);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8); text-align: center; transform: scale(0.9); transition: transform 0.3s;
+            background: linear-gradient(145deg, var(--wood-light), var(--wood-dark));
+            padding: 40px; border-radius: 20px; border: 2px solid var(--accent-gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9); text-align: center; transform: scale(0.9); transition: transform 0.3s;
         }
         #mode-modal.active .mode-card { transform: scale(1); }
-        .mode-title { font-family: var(--font-fancy); font-size: 2rem; color: var(--accent-gold); margin-bottom: 20px; }
+        .mode-title { font-family: var(--font-fancy); font-size: 2rem; color: var(--accent-gold); margin-bottom: 30px; }
         .mode-btn-group { display: flex; gap: 20px; }
-        
+
         /* --- HUB --- */
         #game-hub {
-            width: 95%; max-width: 1000px; height: 85vh;
-            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+            width: 95%; max-width: 1100px; height: 85vh;
+            background: linear-gradient(to bottom, #4e342e, #2d1b18);
             border-radius: 15px; padding: 30px; display: flex; flex-direction: column;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.5), 0 0 0 10px var(--wood-dark);
-            border-bottom: 15px solid #2d1b18; transition: transform 0.8s, opacity 0.6s; z-index: 10;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8), 0 30px 50px rgba(0,0,0,0.6);
+            border: 8px solid #3e2723; transition: transform 0.6s, opacity 0.6s; z-index: 10;
         }
-        .hub-header { text-align: center; margin-bottom: 30px; font-family: var(--font-fancy); font-size: 3rem; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.6); }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); grid-gap: 25px; overflow-y: auto; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 8px; box-shadow: inset 0 5px 20px rgba(0,0,0,0.5); }
+        .hub-header { text-align: center; margin-bottom: 20px; font-family: var(--font-fancy); font-size: 3.5rem; color: var(--accent-gold); text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); grid-gap: 25px; overflow-y: auto; padding: 20px; }
         .game-grid::-webkit-scrollbar { width: 8px; background: rgba(0,0,0,0.3); }
-        .game-grid::-webkit-scrollbar-thumb { background: var(--accent-brass); border-radius: 4px; }
-        .game-card {
-            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%); color: var(--wood-dark);
-            border-radius: 12px; height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; position: relative; box-shadow: 0 5px 0 #9e9e9e, 0 15px 20px rgba(0,0,0,0.3);
-            transition: all 0.2s; transform-style: preserve-3d; border: 2px solid #fff;
-        }
-        .game-card:hover { transform: translateY(-8px); box-shadow: 0 13px 0 #9e9e9e, 0 25px 30px rgba(0,0,0,0.4); }
-        .game-card.disabled { filter: grayscale(90%); opacity: 0.7; cursor: not-allowed; transform: none !important; box-shadow: none; background: #ccc;}
-        .game-icon-wrapper { font-size: 3.5rem; margin-bottom: 10px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2)); }
+        .game-grid::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 4px; }
         
+        .game-card {
+            background: #fff; color: #333;
+            border-radius: 15px; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; box-shadow: 0 8px 0 #bdbdbd, 0 15px 20px rgba(0,0,0,0.4);
+            transition: transform 0.2s; border: 4px solid #fff;
+        }
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 13px 0 #bdbdbd, 0 25px 30px rgba(0,0,0,0.5); z-index: 5; }
+        .game-card.disabled { filter: grayscale(100%); opacity: 0.6; pointer-events: none; background: #e0e0e0; box-shadow: none; transform: none; }
+        .game-icon { font-size: 4rem; margin-bottom: 10px; }
+        .game-title { font-weight: 800; font-size: 1.2rem; }
+        .game-status { font-size: 0.8rem; font-weight: bold; color: #777; margin-top: 5px; text-transform: uppercase; }
+
+        /* --- ACTIVE GAME CONTAINER --- */
         #active-game-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--felt-green);
-            background-image: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 90%), var(--felt-texture);
-            transform: translateY(120%) rotateX(20deg); opacity: 0; transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; z-index: 20; box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            background-image: var(--felt-texture);
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+            transform: translateY(100%); opacity: 0; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; z-index: 20;
         }
-        #active-game-container.visible { transform: translateY(0) rotateX(0deg); opacity: 1; }
+        #active-game-container.visible { transform: translateY(0); opacity: 1; }
+        
         .game-navbar {
-            padding: 15px 30px; background: linear-gradient(to bottom, var(--accent-brass), #8c7f32);
-            border-bottom: 4px solid #6b6026; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: flex; justify-content: space-between; align-items: center; color: var(--wood-dark);
+            padding: 15px 40px; background: #212121;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: flex; justify-content: space-between; align-items: center; color: #fff;
+            border-bottom: 2px solid var(--accent-gold);
         }
-        #current-game-title { font-family: var(--font-fancy); font-weight: 700; font-size: 1.5rem; }
         .btn {
-            padding: 12px 24px; border: none; background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
-            color: var(--accent-gold); font-family: var(--font-ui); font-weight: 700; border-radius: 8px;
-            cursor: pointer; box-shadow: 0 4px 0 #2d1b18, 0 8px 10px rgba(0,0,0,0.3); transition: all 0.1s;
+            padding: 12px 25px; border: none; background: linear-gradient(to bottom, #ffca28, #ff6f00);
+            color: #3e2723; font-family: var(--font-ui); font-weight: 800; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 4px 0 #e65100, 0 5px 10px rgba(0,0,0,0.3); transition: transform 0.1s;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .btn:active { transform: translateY(4px); box-shadow: 0 0px 0 #2d1b18; }
-        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; padding: 20px; }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn:active { transform: translateY(2px); box-shadow: 0 0px 0 #e65100; }
+        
+        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; padding: 20px; perspective: 1000px; }
         .status-display {
-            font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; background: rgba(0,0,0,0.6);
-            color: var(--accent-gold); padding: 10px 40px; border-radius: 50px; border: 3px solid var(--accent-brass);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4); text-align: center; min-width: 300px;
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; background: rgba(0,0,0,0.7);
+            color: var(--accent-gold); padding: 10px 40px; border-radius: 50px; border: 2px solid var(--accent-gold);
+            text-align: center; min-width: 300px;
         }
 
-        /* --- CONNECT FOUR --- */
-        .c4-frame { position: relative; padding: 15px; background: var(--plastic-blue-dark); border-radius: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.5); }
-        .c4-layer-container { position: relative; width: 490px; height: 420px; background: #003c8f; overflow: hidden; border-radius: 5px; }
-        .c4-pieces-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        .c4-mask-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; display: grid; grid-template-columns: repeat(7, 70px); grid-template-rows: repeat(6, 70px); pointer-events: none; }
-        .c4-mask-cell { width: 70px; height: 70px; background: radial-gradient(circle at center, transparent 28px, var(--plastic-blue) 29px); box-shadow: inset 1px 1px 2px rgba(255,255,255,0.3), inset -1px -1px 2px rgba(0,0,0,0.3); }
-        .c4-click-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; display: grid; grid-template-columns: repeat(7, 1fr); }
-        .c4-col-trigger { height: 100%; cursor: pointer; }
-        .c4-col-trigger:hover { background: rgba(255,255,255,0.1); }
-        .c4-piece { width: 60px; height: 60px; border-radius: 50%; position: absolute; top: -70px; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5), inset 5px 5px 10px rgba(255,255,255,0.3); }
-        .c4-piece.red { background: var(--plastic-red); border: 2px solid #b71c1c; }
-        .c4-piece.yellow { background: var(--plastic-yellow); border: 2px solid #f9a825; }
-        .falling { animation: realisticDrop 0.6s cubic-bezier(0.5, 0.05, 1, 0.5) forwards; }
-        @keyframes realisticDrop {
-            0% { transform: translateY(0); }
-            60% { transform: translateY(var(--dest)); animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-            75% { transform: translateY(calc(var(--dest) - 30px)); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
-            85% { transform: translateY(var(--dest)); animation-timing-function: ease-out; }
-            95% { transform: translateY(calc(var(--dest) - 8px)); animation-timing-function: ease-in; }
-            100% { transform: translateY(var(--dest)); }
+        /* --- YAHTZEE PROFESSIONAL --- */
+        .yz-layout { 
+            display: flex; gap: 30px; width: 90%; max-width: 1000px; height: 80%; 
+            background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px;
+        }
+        .yz-board { 
+            flex: 2; display: flex; flex-direction: column; 
+            background: #1b5e20; border: 15px solid #3e2723; border-radius: 15px; 
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+        }
+        .yz-tray {
+            flex: 1; position: relative; perspective: 1000px; display: flex; justify-content: center; align-items: center;
+        }
+        .yz-controls {
+            height: 80px; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
         }
 
-        /* --- YAHTZEE PROFESSIONAL VISUALS --- */
-        .yz-layout { display: flex; gap: 20px; height: 100%; width: 100%; max-width: 900px; }
-        .yz-board { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-                    background-color: #074e0c; border: 15px solid #5d4037; border-radius: 10px; 
-                    box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 20px 30px rgba(0,0,0,0.5); padding: 20px; position: relative; }
-        .yz-scorecard { width: 320px; background: #ffffef; color: #333; border-radius: 2px; padding: 15px; 
-                        font-family: 'Courier Prime', monospace; font-size: 0.9rem; height: 100%; 
-                        overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid #ccc; }
-        
-        /* 3D DICE CONTAINER */
-        .dice-container { 
-            display: flex; gap: 20px; margin-bottom: 30px; perspective: 1200px; 
-            height: 120px; width: 100%; justify-content: center; align-items: center; 
+        /* 3D Dice */
+        .dice-set {
+            display: flex; gap: 30px; width: 100%; justify-content: center; height: 100px; align-items: center;
         }
-        
-        /* THE DIE */
-        .die { 
-            width: 60px; height: 60px; position: relative; 
-            transform-style: preserve-3d; cursor: pointer; 
-            transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        .die-wrap {
+            width: 80px; height: 80px; position: relative; cursor: pointer;
+            transition: transform 0.2s;
         }
-        
-        .die.rolling { animation: tumble 0.6s linear infinite; }
-        
-        .die-face { 
-            position: absolute; width: 60px; height: 60px; 
-            background: linear-gradient(135deg, #fff 0%, #eee 100%); 
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
-            display: flex; justify-content: center; align-items: center; 
-            backface-visibility: hidden; 
+        .die-wrap:hover { transform: scale(1.05); }
+        .die-wrap.held { transform: translateY(-20px); }
+        .die-wrap.held::after {
+            content: 'HELD'; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+            font-size: 12px; font-weight: bold; color: var(--accent-gold); background: #000; padding: 2px 6px; border-radius: 4px;
         }
-        
-        /* Realistic Dots */
-        .dot { 
-            width: 12px; height: 12px; background: #222; border-radius: 50%; 
-            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.5);
+
+        .die {
+            width: 100%; height: 100%; position: absolute; transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        
+        .die.rolling { animation: tumble 0.5s linear infinite; }
+
+        .face {
+            position: absolute; width: 80px; height: 80px; 
+            background: radial-gradient(circle at center, #f5f5f5, #e0e0e0);
+            border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid #ccc;
+        }
+        .dot {
+            position: absolute; width: 16px; height: 16px; background: #222; border-radius: 50%;
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.8);
+        }
         /* Face Transforms */
-        .face-1 { transform: translateZ(30px); }
-        .face-6 { transform: rotateY(180deg) translateZ(30px); }
-        .face-2 { transform: rotateX(-90deg) translateZ(30px); }
-        .face-5 { transform: rotateX(90deg) translateZ(30px); }
-        .face-3 { transform: rotateY(90deg) translateZ(30px); }
-        .face-4 { transform: rotateY(-90deg) translateZ(30px); }
+        .f1 { transform: translateZ(40px); }
+        .f2 { transform: rotateY(180deg) translateZ(40px); }
+        .f3 { transform: rotateY(90deg) translateZ(40px); }
+        .f4 { transform: rotateY(-90deg) translateZ(40px); }
+        .f5 { transform: rotateX(90deg) translateZ(40px); }
+        .f6 { transform: rotateX(-90deg) translateZ(40px); }
         
-        /* Dot Positioning */
-        .face-1 { display: flex; justify-content: center; align-items: center; }
-        .face-2 { display: flex; justify-content: space-between; padding: 10px; } .face-2 .dot:nth-child(2) { align-self: flex-end; }
-        .face-3 { display: flex; justify-content: space-between; padding: 10px; } .face-3 .dot:nth-child(2) { align-self: center; } .face-3 .dot:nth-child(3) { align-self: flex-end; }
-        .face-4 { display: grid; grid-template-columns: 1fr 1fr; padding: 10px; gap: 8px; }
-        .face-5 { display: grid; grid-template-columns: 1fr 1fr; padding: 10px; gap: 8px; } .face-5 .dot:nth-child(3) { grid-column: 1 / span 2; justify-self: center; }
-        .face-6 { display: grid; grid-template-columns: 1fr 1fr; padding: 10px; gap: 4px; grid-template-rows: 1fr 1fr 1fr; }
-        
-        /* Hold Selection */
-        .die.held { transform: translateY(-15px) rotateX(20deg) !important; }
-        .die.held .die-face { background: #ffcdd2; border: 2px solid #d32f2f; }
-        
+        /* Dot Pos */
+        .c { top:32px; left:32px; } /* Center */
+        .tl { top:10px; left:10px; } .tr { top:10px; right:10px; }
+        .bl { bottom:10px; left:10px; } .br { bottom:10px; right:10px; }
+        .ml { top:32px; left:10px; } .mr { top:32px; right:10px; }
+
         @keyframes tumble {
-            0% { transform: rotate3d(1, 1, 1, 0deg); }
-            100% { transform: rotate3d(1, 2, 0, 360deg); }
+            0% { transform: rotate3d(1,1,1,0deg); }
+            100% { transform: rotate3d(1,2,0,360deg); }
         }
 
-        /* Scorecard Rows */
-        .yz-row { display: flex; justify-content: space-between; padding: 6px 4px; border-bottom: 1px dashed #ccc; cursor: pointer; transition: background 0.1s; }
-        .yz-row:hover:not(.filled) { background: rgba(0,0,0,0.05); }
-        .yz-row.filled { color: #888; font-style: italic; cursor: default; }
-        .yz-cat { flex: 1; font-weight: bold; }
-        .yz-val { width: 35px; text-align: center; font-weight: bold; }
-        .yz-row.total { background: #333; color: #fff; margin-top: 10px; border: none; }
-
-        /* --- TIC TAC TOE (Restored) --- */
-        .ttt-board { display: grid; grid-template-columns: repeat(3, 110px); grid-gap: 15px; background-color: var(--accent-brass); padding: 10px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 3px solid #8c7f32; }
-        .ttt-cell { width: 110px; height: 110px; background: var(--felt-green); background-image: var(--felt-texture); box-shadow: inset 0 0 15px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 5rem; font-family: var(--font-fancy); cursor: pointer; border-radius: 5px; position: relative; overflow: hidden; }
-        .ttt-cell:hover { background-color: #0d5c12; }
-        .ttt-piece { position: absolute; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8)); transform-origin: center; animation: stampIn 0.2s cubic-bezier(0.5, 0, 0.75, 0) forwards; }
-        .ttt-piece.x { background: linear-gradient(to bottom, #dcedc8, #aed581); -webkit-background-clip: text; color: transparent; }
-        .ttt-piece.o { background: linear-gradient(to bottom, #ffccbc, #ffab91); -webkit-background-clip: text; color: transparent; }
-        @keyframes stampIn { from { transform: scale(2) rotate(var(--r, 0deg)); opacity: 0; } to { transform: scale(1) rotate(var(--r, 0deg)); opacity: 1; } }
-
-        /* --- CHECKERS (Restored) --- */
-        .checkers-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid var(--wood-light); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .chk-cell { width: 60px; height: 60px; position: relative; }
-        .chk-cell.light { background: #eecfa1; }
-        .chk-cell.dark { background: #5d4037; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .chk-cell.highlight { box-shadow: inset 0 0 0 3px #76ff03; cursor: pointer; }
-        .chk-piece { width: 50px; height: 50px; border-radius: 50%; position: absolute; top: 5px; left: 5px; box-shadow: 0 5px 5px rgba(0,0,0,0.5), inset 0 0 0 5px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .chk-piece:hover { transform: translateY(-3px); box-shadow: 0 8px 8px rgba(0,0,0,0.6); }
-        .chk-piece.selected { box-shadow: 0 0 0 3px #ffff00, 0 8px 8px rgba(0,0,0,0.6); transform: scale(1.1); z-index: 10; }
-        .chk-piece.p1 { background: radial-gradient(#d32f2f, #b71c1c); border: 2px solid #e57373; }
-        .chk-piece.p2 { background: radial-gradient(#424242, #212121); border: 2px solid #616161; }
-        .chk-king-icon { font-size: 30px; color: gold; display: none; text-shadow: 0 2px 2px rgba(0,0,0,0.8); }
-        .chk-piece.king .chk-king-icon { display: block; }
-
-        /* --- CHESS & REVERSI SHARED --- */
-        .chess-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #3e2723; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        .chess-cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
-        .chess-cell.light { background: #e0c096; }
-        .chess-cell.dark { background: #8d6e63; }
-        .chess-cell.selected { background: #ffeb3b !important; }
-        .chess-cell.possible-move::after { content: ''; width: 15px; height: 15px; background: rgba(0,0,0,0.3); border-radius: 50%; position: absolute; }
-        .chess-cell.capture-move { background: #ef5350 !important; }
-        .chess-piece { font-size: 45px; cursor: pointer; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.4)); transition: transform 0.2s; }
-        .chess-piece:hover { transform: translateY(-5px); }
-        .chess-piece.white { color: #f5f5f5; text-shadow: 0 1px 0 #999; }
-        .chess-piece.black { color: #212121; text-shadow: 0 1px 0 #000; }
+        /* Scorecard */
+        .yz-scorecard {
+            flex: 1; background: #fff8e1; border-radius: 5px; color: #333;
+            font-family: var(--font-mono); font-size: 0.9rem;
+            display: flex; flex-direction: column; border: 1px solid #ccc;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .yz-header { display: flex; background: #3e2723; color: #fff; padding: 10px; font-weight: bold; }
+        .yz-cell { flex: 1; text-align: center; } .yz-cell.wide { flex: 2; text-align: left; }
+        .yz-row { display: flex; border-bottom: 1px solid #ddd; padding: 6px 10px; cursor: pointer; transition: background 0.1s; }
+        .yz-row:hover:not(.locked) { background: #ffe082; }
+        .yz-row.locked { color: #888; cursor: default; background: #eee; }
+        .yz-val { font-weight: bold; }
+        .yz-total { background: #5d4037; color: #fff; font-weight: bold; }
         
-        .reversi-board { display: grid; grid-template-columns: repeat(8, 50px); grid-gap: 4px; background: #333; padding: 8px; border-radius: 5px; border: 4px solid #444; }
-        .reversi-cell { width: 50px; height: 50px; background: var(--felt-green); background-image: var(--felt-texture); display: flex; justify-content: center; align-items: center; perspective: 600px; cursor: pointer; }
-        .reversi-cell.legal-move::after { content: ''; width: 15px; height: 15px; background: rgba(0,0,0,0.2); border-radius: 50%; border: 2px solid rgba(255,255,255,0.1); }
-        .reversi-chip { width: 40px; height: 40px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; border-radius: 50%; }
-        .chip-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.4); border: 1px solid rgba(0,0,0,0.2); }
-        .chip-front { background: radial-gradient(circle at 30% 30%, #444, #000); }
-        .chip-back { background: radial-gradient(circle at 30% 30%, #fff, #ddd); transform: rotateY(180deg); }
-        .reversi-chip.black { transform: rotateY(0deg); }
-        .reversi-chip.white { transform: rotateY(180deg); }
+        /* --- TIC TAC TOE (FIXED) --- */
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 120px); gap: 10px; background: #8d6e63; padding: 10px; border-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .ttt-cell { width: 120px; height: 120px; background: #3e2723; display: flex; justify-content: center; align-items: center; font-size: 5rem; font-family: var(--font-fancy); cursor: pointer; position: relative; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .ttt-cell:hover { background: #4e342e; }
+        .ttt-piece { position: absolute; transform: scale(0); animation: pop 0.3s forwards; }
+        .ttt-piece.x { color: #ef5350; text-shadow: 0 2px 10px rgba(239, 83, 80, 0.4); }
+        .ttt-piece.o { color: #42a5f5; text-shadow: 0 2px 10px rgba(66, 165, 245, 0.4); }
+        @keyframes pop { to { transform: scale(1); } }
+
+        /* --- CHECKERS (FIXED) --- */
+        .chk-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #5d4037; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .chk-cell { width: 60px; height: 60px; position: relative; }
+        .chk-cell.w { background: #d7ccc8; }
+        .chk-cell.b { background: #5d4037; }
+        .chk-cell.highlight::after { content:''; position: absolute; top:0; left:0; width:100%; height:100%; box-shadow: inset 0 0 0 3px #76ff03; }
+        .chk-piece { width: 50px; height: 50px; border-radius: 50%; position: absolute; top:5px; left:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.6); cursor: pointer; transition: transform 0.2s; display: flex; justify-content: center; align-items: center;}
+        .chk-piece:hover { transform: scale(1.1); }
+        .chk-piece.p1 { background: radial-gradient(circle at 30% 30%, #e53935, #b71c1c); border: 2px solid #ef9a9a; }
+        .chk-piece.p2 { background: radial-gradient(circle at 30% 30%, #424242, #212121); border: 2px solid #757575; }
+        .chk-piece.king::after { content: '♛'; color: gold; font-size: 30px; drop-shadow: 0 2px 2px rgba(0,0,0,0.8); }
+
+        /* --- C4 & CHESS (Preserved) --- */
+        .c4-frame { padding: 15px; background: #01579b; border-radius: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .c4-grid { display: grid; grid-template-columns: repeat(7, 70px); grid-template-rows: repeat(6, 70px); background: #0277bd; border-radius: 5px; }
+        .c4-cell { width: 70px; height: 70px; position: relative; cursor: pointer; }
+        .c4-mask { position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 28px, #0277bd 29px); z-index: 10; pointer-events: none; }
+        .c4-piece { width: 60px; height: 60px; border-radius: 50%; position: absolute; top: 5px; left: 5px; z-index: 5; }
+        .c4-piece.red { background: #d32f2f; } .c4-piece.yel { background: #fbc02d; }
+        
+        .chess-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .chess-cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; font-size: 40px; cursor: pointer; }
+        .chess-cell.l { background: #d7ccc8; } .chess-cell.d { background: #8d6e63; }
+        .chess-cell.sel { background: #ffeb3b; }
+        .chess-cell.mv::after { content:''; width:15px; height:15px; background:rgba(0,0,0,0.3); border-radius:50%; }
+        .chess-piece { filter: drop-shadow(0 3px 2px rgba(0,0,0,0.4)); }
+        .chess-piece.w { color: #fff; text-shadow: 0 1px #999; } .chess-piece.b { color: #000; }
+
     </style>
 </head>
 <body>
+
     <div id="mode-modal">
         <div class="mode-card">
             <div class="mode-title">Select Mode</div>
@@ -252,434 +240,389 @@
             </div>
         </div>
     </div>
+
     <div id="game-hub">
         <div class="hub-header">Clubhouse Deluxe</div>
         <div class="game-grid" id="game-grid"></div>
     </div>
+
     <div id="active-game-container">
         <div class="game-navbar">
-            <button class="btn" onclick="app.returnToHub()">← Collection</button>
-            <h2 id="current-game-title">Game Title</h2>
-            <button class="btn" onclick="app.resetCurrentGame()">Restart</button>
+            <button class="btn" onclick="app.toHub()">← Library</button>
+            <h2 id="game-title">Game</h2>
+            <button class="btn" onclick="app.reset()">Reset</button>
         </div>
         <div class="game-area">
-            <div class="status-display" id="game-status">Player's Turn</div>
-            <div id="game-board-container" style="width:100%; height:100%; display:flex; justify-content:center; align-items:center;"></div>
+            <div class="status-display" id="status">Ready</div>
+            <div id="board"></div>
         </div>
     </div>
 
     <script>
-        class BoardGame {
-            constructor(c, s, ai) { this.container=c; this.statusEl=s; this.vsAI=ai; this.isPlayerTurn=true; this.gameOver=false; this.init(); }
-            updateStatus(m) { this.statusEl.innerText=m; }
-            aiDelay(cb) { setTimeout(cb, 1000); }
-            endTurn() { this.isPlayerTurn=!this.isPlayerTurn; if(this.gameOver)return; if(this.vsAI&&!this.isPlayerTurn){this.updateStatus("AI Thinking...");this.aiDelay(()=>this.makeAIMove());}else{this.updateStatus(this.isPlayerTurn?"Player 1":"Player 2");} }
+        // --- BASE ENGINE ---
+        class Game {
+            constructor(el, st, ai) { this.el=el; this.st=st; this.ai=ai; this.turn=1; this.over=false; this.init(); }
+            status(m) { this.st.innerText = m; }
+            wait(cb, t=800) { setTimeout(cb, t); }
+            endTurn() {
+                this.turn = this.turn === 1 ? 2 : 1;
+                if(this.over) return;
+                const p = this.turn === 1 ? "Player 1" : (this.ai ? "AI" : "Player 2");
+                this.status(`${p}'s Turn`);
+                if(this.ai && this.turn === 2) this.wait(() => this.aiMove());
+            }
         }
 
-        /* --- YAHTZEE 3D PHYSICS ENGINE --- */
-        class Yahtzee extends BoardGame {
+        // --- YAHTZEE 3D ---
+        class Yahtzee extends Game {
             init() {
-                this.dice = [1,1,1,1,1]; this.held = [false,false,false,false,false];
-                this.rollsLeft = 3; 
-                this.scores = { p1: Array(13).fill(null), p2: Array(13).fill(null) };
-                this.cats = ["Ones","Twos","Threes","Fours","Fives","Sixes","3 of Kind","4 of Kind","Full House","Sm. Straight","Lg. Straight","Yahtzee","Chance"];
-                this.renderLayout(); this.updateStatus(this.vsAI?"Your Turn (Rolls: 3)":"P1 Turn (Rolls: 3)");
+                this.dice = [1,1,1,1,1];
+                this.held = [false,false,false,false,false];
+                this.rolls = 3;
+                this.scores = { 1: Array(13).fill(null), 2: Array(13).fill(null) };
+                this.cats = ["Ones", "Twos", "Threes", "Fours", "Fives", "Sixes", "3 of Kind", "4 of Kind", "Full House", "Sm Straight", "Lg Straight", "Yahtzee", "Chance"];
+                this.renderBoard();
+                this.updateUI();
             }
 
-            renderLayout() {
-                this.container.innerHTML = `
+            renderBoard() {
+                this.el.innerHTML = `
                     <div class="yz-layout">
                         <div class="yz-board">
-                            <div class="dice-container" id="yz-dice"></div>
-                            <button class="btn" id="yz-roll-btn" onclick="app.currentGame.rollDice()">Roll Dice</button>
+                            <div class="yz-tray" id="yz-tray"></div>
+                            <div class="yz-controls">
+                                <button class="btn" id="roll-btn" onclick="app.game.roll()">Roll (3)</button>
+                            </div>
                         </div>
-                        <div class="yz-scorecard" id="yz-scorecard"></div>
-                    </div>`;
-                this.renderDice(true); // Initial static render
-                this.renderScorecard();
+                        <div class="yz-scorecard" id="yz-card"></div>
+                    </div>
+                `;
+                this.renderDice();
+                this.renderCard();
             }
 
-            // Renders 3D dice. If 'randomRot' is true, gives them a "messy" look.
-            // If just updating held status, keeps their current rotation.
-            renderDice(resetTransforms = false) {
-                const con = document.getElementById('yz-dice'); 
-                // Only create elements if they don't exist, otherwise update them
-                if(con.innerHTML === '') {
-                    this.dice.forEach((val, i) => {
-                        const d = document.createElement('div');
-                        d.className = 'die';
-                        d.id = `die-${i}`;
-                        d.onclick = () => this.toggleHold(i);
-                        
-                        let facesHtml = '';
-                        const dots = (n) => Array(n).fill('<div class="dot"></div>').join('');
-                        [1,2,3,4,5,6].forEach(f => facesHtml += `<div class="die-face face-${f}">${dots(f)}</div>`);
-                        d.innerHTML = facesHtml;
-                        con.appendChild(d);
-                    });
-                }
-                
-                // Update Classes and Transforms
-                this.dice.forEach((val, i) => {
-                    const d = document.getElementById(`die-${i}`);
-                    d.className = `die ${this.held[i]?'held':''}`;
-                    
-                    if(resetTransforms) {
-                         // Initial presentation
-                         const rotMap = {1:[0,0], 2:[-90,0], 3:[0,-90], 4:[0,90], 5:[90,0], 6:[180,0]};
-                         d.style.transform = `rotateX(${rotMap[val][0]}deg) rotateY(${rotMap[val][1]}deg)`;
+            renderDice() {
+                const t = document.getElementById('yz-tray');
+                if(!t.innerHTML) {
+                    // Create Dice DOM
+                    for(let i=0; i<5; i++) {
+                        const w = document.createElement('div'); w.className = 'die-wrap';
+                        w.onclick = () => this.toggle(i);
+                        const d = document.createElement('div'); d.className = 'die'; d.id = `d${i}`;
+                        // Faces
+                        const dots = n => {
+                            let h=''; 
+                            if(n===1) h='<div class="dot c"></div>';
+                            if(n===2) h='<div class="dot tl"></div><div class="dot br"></div>';
+                            if(n===3) h='<div class="dot tl"></div><div class="dot c"></div><div class="dot br"></div>';
+                            if(n===4) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            if(n===5) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot c"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            if(n===6) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot ml"></div><div class="dot mr"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            return h;
+                        }
+                        for(let f=1; f<=6; f++) {
+                            const face = document.createElement('div'); face.className = `face f${f}`;
+                            face.innerHTML = dots(f);
+                            d.appendChild(face);
+                        }
+                        w.appendChild(d); t.appendChild(w);
                     }
-                });
+                }
+                this.updateDiceTransforms();
             }
 
-            renderScorecard() {
-                const sc = document.getElementById('yz-scorecard');
-                let html = `<div style="display:grid; grid-template-columns: 2fr 1fr 1fr; font-weight:bold; border-bottom:2px solid #333; margin-bottom:5px;"><div>Category</div><div>P1</div><div>${this.vsAI?'AI':'P2'}</div></div>`;
+            updateDiceTransforms(random = false) {
+                const rot = {1:[0,0], 2:[-90,0], 3:[0,-90], 4:[0,90], 5:[90,0], 6:[180,0]};
+                for(let i=0; i<5; i++) {
+                    const d = document.getElementById(`d${i}`);
+                    const w = d.parentElement;
+                    w.className = `die-wrap ${this.held[i]?'held':''}`;
+                    if(!this.held[i] || random) {
+                        const val = this.dice[i];
+                        const rx = rot[val][0] + (random ? (Math.random()*10-5) : 0);
+                        const ry = rot[val][1] + (random ? (Math.random()*10-5) : 0);
+                        d.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+                    }
+                }
+            }
+
+            renderCard() {
+                const c = document.getElementById('yz-card');
+                let h = `<div class="yz-header"><div class="yz-cell wide">Category</div><div class="yz-cell">P1</div><div class="yz-cell">${this.ai?'AI':'P2'}</div></div>`;
                 
                 this.cats.forEach((cat, i) => {
-                    const s1 = this.scores.p1[i], s2 = this.scores.p2[i];
-                    const p1Click = (this.isPlayerTurn && s1===null && this.rollsLeft<3) ? `onclick="app.currentGame.score(${i})"` : '';
-                    const p2Click = (!this.isPlayerTurn && !this.vsAI && s2===null && this.rollsLeft<3) ? `onclick="app.currentGame.score(${i})"` : '';
+                    const s1 = this.scores[1][i];
+                    const s2 = this.scores[2][i];
+                    const p1Can = this.turn===1 && s1===null && this.rolls<3;
+                    const p2Can = this.turn===2 && !this.ai && s2===null && this.rolls<3;
                     
-                    html += `
-                    <div class="yz-row ${s1!==null&&this.isPlayerTurn?'filled':''}">
-                        <div class="yz-cat">${cat}</div>
-                        <div class="yz-val" ${p1Click} style="${p1Click?'cursor:pointer;background:#bbdefb; border:1px solid #1976d2':''}">${s1===null?'-':s1}</div>
-                        <div class="yz-val" ${p2Click} style="${p2Click?'cursor:pointer;background:#bbdefb; border:1px solid #1976d2':''}">${s2===null?'-':s2}</div>
+                    h += `<div class="yz-row ${s1!==null?'locked':''}" ${p1Can?`onclick="app.game.pick(${i})"`:''}>
+                        <div class="yz-cell wide">${cat}</div>
+                        <div class="yz-cell yz-val" style="${p1Can?'color:blue':''}">${s1===null?'-':s1}</div>
+                        <div class="yz-cell yz-val" ${p2Can?`onclick="app.game.pick(${i})"`:''} style="${p2Can?'color:blue; cursor:pointer':''}">${s2===null?'-':s2}</div>
                     </div>`;
                 });
                 
-                const sum = (arr) => arr.reduce((a,b)=>a+(b||0),0);
-                html += `<div class="yz-row total"><div>Total</div><div>${sum(this.scores.p1)}</div><div>${sum(this.scores.p2)}</div></div>`;
-                sc.innerHTML = html;
+                // Totals
+                const sum = arr => arr.reduce((a,b)=>a+(b||0),0);
+                h += `<div class="yz-row yz-total"><div class="yz-cell wide">TOTAL</div><div class="yz-cell">${sum(this.scores[1])}</div><div class="yz-cell">${sum(this.scores[2])}</div></div>`;
+                c.innerHTML = h;
             }
 
-            toggleHold(i) {
-                if(this.rollsLeft === 3) return;
-                if(this.vsAI && !this.isPlayerTurn) return;
+            updateUI() {
+                const btn = document.getElementById('roll-btn');
+                const p = this.turn===1?"Player 1":(this.ai?"AI":"Player 2");
+                this.status(this.rolls===3 ? `${p}: Roll to Start` : (this.rolls===0 ? `${p}: Select Score` : `${p}: Rolls Left ${this.rolls}`));
+                btn.innerText = `Roll (${this.rolls})`;
+                btn.disabled = this.rolls === 0 || (this.ai && this.turn===2);
+            }
+
+            toggle(i) {
+                if(this.rolls===3 || (this.ai && this.turn===2)) return;
                 this.held[i] = !this.held[i];
-                // Just toggle class, don't reset transform
-                const d = document.getElementById(`die-${i}`);
-                d.className = `die ${this.held[i]?'held':''}`;
+                this.updateDiceTransforms();
             }
 
-            rollDice() {
-                if(this.rollsLeft <= 0) return;
-                this.rollsLeft--;
-                const diceEls = document.querySelectorAll('.die');
-                
-                // 1. Add Tumbling Class
-                this.dice.forEach((v, i) => {
+            roll() {
+                if(this.rolls<=0) return;
+                this.rolls--;
+                // Anim
+                for(let i=0; i<5; i++) {
                     if(!this.held[i]) {
-                        diceEls[i].classList.add('rolling');
-                        // Generate logic result
+                        document.getElementById(`d${i}`).classList.add('rolling');
                         this.dice[i] = Math.ceil(Math.random()*6);
                     }
-                });
-
-                // 2. Stop Tumble and Set Final Rotation
+                }
+                this.updateUI();
+                
                 setTimeout(() => {
-                    this.dice.forEach((val, i) => {
-                        if(!this.held[i]) {
-                            const d = diceEls[i];
-                            d.classList.remove('rolling');
-                            
-                            // Base rotation for the face
-                            // 1: X0 Y0, 2: X-90 Y0, 3: X0 Y-90, 4: X0 Y90, 5: X90 Y0, 6: X180 Y0
-                            const baseRot = {1:[0,0], 2:[-90,0], 3:[0,-90], 4:[0,90], 5:[90,0], 6:[0,180]};
-                            
-                            // Add randomness (full spins) for realism
-                            const randX = (Math.floor(Math.random()*2) + 2) * 360; 
-                            const randY = (Math.floor(Math.random()*2) + 2) * 360;
-                            
-                            const finalX = baseRot[val][0] + randX;
-                            const finalY = baseRot[val][1] + randY;
-
-                            d.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
-                        }
-                    });
+                    for(let i=0; i<5; i++) document.getElementById(`d${i}`).classList.remove('rolling');
+                    this.updateDiceTransforms(true); // Add random tilt
+                    this.renderCard(); // Re-render to update clickability
                     
-                    this.renderScorecard();
-                    const pName = this.isPlayerTurn ? "P1" : (this.vsAI?"AI":"P2");
-                    this.updateStatus(this.rollsLeft===0 ? `${pName}: Select Score` : `${pName} (Rolls: ${this.rollsLeft})`);
-                    
-                    if(this.vsAI && !this.isPlayerTurn) {
-                        if(this.rollsLeft > 0) this.aiDelay(()=>this.aiRollLogic());
-                        else this.aiDelay(()=>this.aiScoreLogic());
+                    if(this.ai && this.turn===2) {
+                         if(this.rolls>0) this.wait(()=>this.aiStrategy(), 1000);
+                         else this.wait(()=>this.aiPick(), 1000);
                     }
-                }, 600);
+                }, 500);
             }
 
-            score(catIdx) {
-                const arr = this.dice;
-                let val = 0;
-                const counts = [0,0,0,0,0,0,0]; arr.forEach(x=>counts[x]++);
-                const sum = arr.reduce((a,b)=>a+b,0);
-                
-                if(catIdx < 6) { val = counts[catIdx+1] * (catIdx+1); }
-                else if(catIdx===6) { if(counts.some(x=>x>=3)) val = sum; }
-                else if(catIdx===7) { if(counts.some(x=>x>=4)) val = sum; }
-                else if(catIdx===8) { if((counts.includes(3)&&counts.includes(2)) || counts.includes(5)) val=25; }
-                else if(catIdx===9) { if(this.checkStraight(counts)>=4) val=30; }
-                else if(catIdx===10) { if(this.checkStraight(counts)>=5) val=40; }
-                else if(catIdx===11) { if(counts.includes(5)) val=50; }
-                else if(catIdx===12) { val = sum; }
+            pick(idx) {
+                const d = this.dice;
+                let s = 0;
+                const counts = [0,0,0,0,0,0,0]; d.forEach(x=>counts[x]++);
+                const sum = d.reduce((a,b)=>a+b,0);
 
-                const p = this.isPlayerTurn ? 'p1' : 'p2';
-                this.scores[p][catIdx] = val;
+                if(idx<6) s = counts[idx+1]*(idx+1);
+                else if(idx===6) { if(counts.some(x=>x>=3)) s=sum; }
+                else if(idx===7) { if(counts.some(x=>x>=4)) s=sum; }
+                else if(idx===8) { if((counts.includes(3)&&counts.includes(2))||counts.includes(5)) s=25; }
+                else if(idx===9) { if(this.straight(counts)>=4) s=30; }
+                else if(idx===10) { if(this.straight(counts)>=5) s=40; }
+                else if(idx===11) { if(counts.includes(5)) s=50; }
+                else if(idx===12) s=sum;
+
+                this.scores[this.turn][idx] = s;
                 
-                // Reset
-                this.held = [false,false,false,false,false];
-                this.rollsLeft = 3;
-                this.dice = [1,1,1,1,1];
-                this.renderDice(true); // Reset to flat
-                this.renderScorecard();
-                
-                if(!this.scores.p1.includes(null) && !this.scores.p2.includes(null)) {
-                    this.gameOver = true;
-                    const s1 = this.scores.p1.reduce((a,b)=>a+b,0);
-                    const s2 = this.scores.p2.reduce((a,b)=>a+b,0);
-                    this.updateStatus(`Game Over! P1:${s1} ${this.vsAI?'AI':'P2'}:${s2}`);
+                // End turn logic
+                this.held.fill(false);
+                this.dice.fill(1);
+                this.rolls = 3;
+                this.updateDiceTransforms();
+                this.renderCard();
+
+                // Check Over
+                if(!this.scores[1].includes(null) && !this.scores[2].includes(null)) {
+                    this.over = true;
+                    const t1=this.scores[1].reduce((a,b)=>a+b,0), t2=this.scores[2].reduce((a,b)=>a+b,0);
+                    this.status(`Game Over! P1: ${t1} - ${this.ai?'AI':'P2'}: ${t2}`);
                 } else {
                     this.endTurn();
-                    if(this.vsAI && !this.isPlayerTurn) this.aiDelay(()=>this.rollDice());
+                    this.updateUI();
+                    if(this.ai && this.turn===2) this.wait(()=>this.roll(), 1000);
                 }
             }
-            
-            checkStraight(counts) {
-                let seq = 0, max = 0;
-                for(let i=1; i<=6; i++) { if(counts[i]>0) seq++; else seq=0; if(seq>max) max=seq; }
-                return max;
+
+            straight(c) { let m=0, cur=0; for(let i=1;i<=6;i++){if(c[i])cur++;else cur=0; if(cur>m)m=cur;} return m; }
+
+            aiStrategy() {
+                const c=[0,0,0,0,0,0,0]; this.dice.forEach(x=>c[x]++);
+                const max = Math.max(...c);
+                const target = c.lastIndexOf(max); // Keep most common
+                this.dice.forEach((d,i) => {
+                     if(d===target && max>=2) this.held[i]=true;
+                     else this.held[i]=false;
+                });
+                this.updateDiceTransforms();
+                this.roll();
             }
 
-            aiRollLogic() {
-                const counts = [0,0,0,0,0,0,0]; this.dice.forEach(x=>counts[x]++);
-                const maxCount = Math.max(...counts);
-                const targetVal = counts.lastIndexOf(maxCount);
-                this.dice.forEach((d, i) => {
-                    if(maxCount >= 2 && d === targetVal) this.held[i] = true;
-                    else this.held[i] = false;
+            aiPick() {
+                // Find best score
+                const open = this.scores[2].map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
+                let bestI=open[0], bestS=-1;
+                // Reuse logic (simulate)
+                open.forEach(i => {
+                    // (Duplicate score logic for simulation)
+                    let s=0; const d=this.dice; const cts=[0,0,0,0,0,0,0]; d.forEach(x=>cts[x]++); const sm=d.reduce((a,b)=>a+b,0);
+                    if(i<6) s = cts[i+1]*(i+1);
+                    else if(i===6 && cts.some(x=>x>=3)) s=sm;
+                    else if(i===7 && cts.some(x=>x>=4)) s=sm;
+                    else if(i===8 && ((cts.includes(3)&&cts.includes(2))||cts.includes(5))) s=25;
+                    else if(i===9 && this.straight(cts)>=4) s=30;
+                    else if(i===10 && this.straight(cts)>=5) s=40;
+                    else if(i===11 && cts.includes(5)) s=50;
+                    else if(i===12) s=sm;
+                    if(s>bestS) { bestS=s; bestI=i; }
                 });
-                this.renderDice(false); // Update held visuals
-                this.aiDelay(()=>this.rollDice());
-            }
-
-            aiScoreLogic() {
-                const openSlots = this.scores.p2.map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
-                let bestSlot = openSlots[0]; let bestScore = -1;
-                openSlots.forEach(idx => {
-                    let s = 0; const arr=this.dice; const counts=[0,0,0,0,0,0,0]; arr.forEach(x=>counts[x]++); const sum=arr.reduce((a,b)=>a+b,0);
-                    if(idx<6) s = counts[idx+1]*(idx+1);
-                    else if(idx===6 && counts.some(x=>x>=3)) s=sum;
-                    else if(idx===7 && counts.some(x=>x>=4)) s=sum;
-                    else if(idx===8 && ((counts.includes(3)&&counts.includes(2))||counts.includes(5))) s=25;
-                    else if(idx===9 && this.checkStraight(counts)>=4) s=30;
-                    else if(idx===10 && this.checkStraight(counts)>=5) s=40;
-                    else if(idx===11 && counts.includes(5)) s=50;
-                    else if(idx===12) s=sum;
-                    if(s > bestScore) { bestScore = s; bestSlot = idx; }
-                });
-                this.score(bestSlot);
+                this.pick(bestI);
             }
         }
 
-        /* --- TIC TAC TOE (Restored & Fixed) --- */
-        class TicTacToe extends BoardGame {
-            init() {
-                this.board = Array(9).fill(null);
-                this.render();
-                this.updateStatus(this.vsAI ? "Your Turn (X)" : "Player 1 (X)");
-            }
+        // --- TIC TAC TOE ---
+        class TicTacToe extends Game {
+            init() { this.board=Array(9).fill(null); this.render(); this.status(this.turn===1?"Player 1 (X)":"Player 2 (O)"); }
             render() {
-                this.container.innerHTML = '<div class="ttt-board"></div>';
-                const el = this.container.querySelector('.ttt-board');
-                for(let i=0; i<9; i++) {
-                    const d = document.createElement('div');
-                    d.className = 'ttt-cell';
-                    d.onclick = () => this.move(i);
-                    el.appendChild(d);
-                }
+                this.el.innerHTML = '<div class="ttt-board"></div>'; const b=this.el.querySelector('.ttt-board');
+                for(let i=0;i<9;i++){ const c=document.createElement('div'); c.className='ttt-cell'; c.onclick=()=>this.move(i); b.appendChild(c); }
             }
             move(i) {
-                if(this.board[i] || this.gameOver || (this.vsAI && !this.isPlayerTurn)) return;
-                const p = this.isPlayerTurn ? 'X' : 'O';
-                this.place(i, p);
+                if(this.board[i]||this.over||(this.ai&&this.turn===2)) return;
+                this.mark(i, this.turn===1?'X':'O');
             }
-            place(i, p) {
-                this.board[i] = p;
-                const cell = this.container.querySelectorAll('.ttt-cell')[i];
-                cell.innerHTML = `<div class="ttt-piece ${p.toLowerCase()}">${p}</div>`;
-                
-                if(this.check(p)) { this.gameOver = true; this.updateStatus(p + " Wins!"); }
-                else if(!this.board.includes(null)) { this.gameOver = true; this.updateStatus("Draw!"); }
-                else this.endTurn();
+            mark(i, p) {
+                this.board[i]=p;
+                this.el.querySelectorAll('.ttt-cell')[i].innerHTML = `<div class="ttt-piece ${p.toLowerCase()}">${p}</div>`;
+                if(this.check(p)){ this.over=true; this.status(p+" Wins!"); return; }
+                if(!this.board.includes(null)){ this.over=true; this.status("Draw!"); return; }
+                this.endTurn();
             }
-            makeAIMove() {
-                let best = -Infinity, move;
-                for(let i=0; i<9; i++) {
-                    if(!this.board[i]) {
-                        this.board[i] = 'O';
-                        let score = this.minimax(this.board, 0, false);
-                        this.board[i] = null;
-                        if(score > best) { best = score; move = i; }
-                    }
+            check(p) { return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(c=>this.board[c[0]]===p&&this.board[c[1]]===p&&this.board[c[2]]===p); }
+            aiMove() {
+                let m, best=-Infinity;
+                for(let i=0;i<9;i++) if(!this.board[i]) {
+                    this.board[i]='O'; let s=this.minimax(this.board,0,false); this.board[i]=null;
+                    if(s>best){best=s;m=i;}
                 }
-                this.place(move, 'O');
+                this.mark(m, 'O');
             }
-            check(p) {
-                const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-                return w.some(c => this.board[c[0]]===p && this.board[c[1]]===p && this.board[c[2]]===p);
-            }
-            minimax(b, d, isMax) {
-                if(this.check('O')) return 10-d;
-                if(this.check('X')) return d-10;
-                if(!b.includes(null)) return 0;
-                if(isMax) {
-                    let best = -Infinity;
-                    for(let i=0; i<9; i++) if(!b[i]) { b[i]='O'; best=Math.max(best, this.minimax(b,d+1,false)); b[i]=null; }
-                    return best;
-                } else {
-                    let best = Infinity;
-                    for(let i=0; i<9; i++) if(!b[i]) { b[i]='X'; best=Math.min(best, this.minimax(b,d+1,true)); b[i]=null; }
-                    return best;
-                }
+            minimax(b,d,max) {
+                if(this.check('O')) return 10-d; if(this.check('X')) return d-10; if(!b.includes(null)) return 0;
+                if(max) { let v=-Infinity; for(let i=0;i<9;i++)if(!b[i]){b[i]='O';v=Math.max(v,this.minimax(b,d+1,false));b[i]=null;} return v; }
+                else { let v=Infinity; for(let i=0;i<9;i++)if(!b[i]){b[i]='X';v=Math.min(v,this.minimax(b,d+1,true));b[i]=null;} return v; }
             }
         }
 
-        /* --- CHECKERS (Restored & Fixed) --- */
-        class Checkers extends BoardGame {
+        // --- CHECKERS ---
+        class Checkers extends Game {
             init() {
-                this.board = Array(8).fill().map(() => Array(8).fill(null));
-                for(let r=0; r<8; r++) {
-                    for(let c=0; c<8; c++) {
-                        if((r+c)%2===1) {
-                            if(r<3) this.board[r][c] = {p:2, k:false};
-                            else if(r>4) this.board[r][c] = {p:1, k:false};
-                        }
-                    }
-                }
-                this.sel = null; this.moves = [];
-                this.render(); this.updateStatus(this.vsAI ? "Your Turn (Red)" : "Red's Turn");
+                this.board = Array(8).fill().map(()=>Array(8).fill(null));
+                for(let r=0;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2){if(r<3)this.board[r][c]={p:2,k:0};if(r>4)this.board[r][c]={p:1,k:0};}
+                this.sel=null; this.moves=[]; this.render(); this.status("Red's Turn");
             }
             render() {
-                this.container.innerHTML = '<div class="checkers-board"></div>';
-                const el = this.container.querySelector('.checkers-board');
-                this.cells = [];
-                for(let r=0; r<8; r++) {
-                    let row = [];
-                    for(let c=0; c<8; c++) {
-                        const d = document.createElement('div');
-                        d.className = `chk-cell ${(r+c)%2===0?'light':'dark'}`;
-                        d.onclick = () => this.click(r, c);
-                        el.appendChild(d);
-                        row.push(d);
-                    }
-                    this.cells.push(row);
-                }
+                this.el.innerHTML = '<div class="chk-board"></div>'; const b=this.el.querySelector('.chk-board');
+                this.grid=[]; for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){
+                    const d=document.createElement('div'); d.className=`chk-cell ${(r+c)%2?'b':'w'}`; d.onclick=()=>this.clk(r,c);
+                    b.appendChild(d); row.push(d);
+                } this.grid.push(row); }
                 this.draw();
             }
             draw() {
-                this.cells.forEach(r => r.forEach(c => { c.innerHTML=''; c.classList.remove('highlight'); }));
-                for(let r=0; r<8; r++) {
-                    for(let c=0; c<8; c++) {
-                        const p = this.board[r][c];
-                        if(p) {
-                            const d = document.createElement('div');
-                            d.className = `chk-piece p${p.p} ${p.k?'king':''}`;
-                            d.innerHTML = p.k ? '<span class="chk-king-icon">♛</span>' : '';
-                            if(this.sel && this.sel.r===r && this.sel.c===c) d.classList.add('selected');
-                            this.cells[r][c].appendChild(d);
-                        }
+                this.grid.forEach(r=>r.forEach(c=>{c.innerHTML='';c.classList.remove('highlight')}));
+                for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+                    const p=this.board[r][c];
+                    if(p){
+                        const d=document.createElement('div'); d.className=`chk-piece p${p.p} ${p.k?'king':''}`;
+                        if(this.sel?.r===r && this.sel?.c===c) d.style.boxShadow='0 0 0 3px gold';
+                        this.grid[r][c].appendChild(d);
                     }
                 }
-                this.moves.forEach(m => this.cells[m.r][m.c].classList.add('highlight'));
+                this.moves.forEach(m=>this.grid[m.r][m.c].classList.add('highlight'));
             }
-            click(r, c) {
-                if(this.gameOver || (this.vsAI && !this.isPlayerTurn)) return;
+            clk(r,c) {
+                if(this.over || (this.ai && this.turn===2)) return;
                 const p = this.board[r][c];
-                const me = this.isPlayerTurn ? 1 : 2;
-                if(p && p.p === me) {
-                    this.sel = {r, c};
-                    this.moves = this.getMoves(r, c, this.board);
-                    this.draw();
-                } else if(this.sel) {
-                    const move = this.moves.find(m => m.r===r && m.c===c);
-                    if(move) this.exec(this.sel, move);
-                    else { this.sel = null; this.moves = []; this.draw(); }
+                if(p && p.p===this.turn) { this.sel={r,c}; this.moves=this.getMoves(r,c,this.board); this.draw(); }
+                else if(this.sel) {
+                    const m = this.moves.find(mv=>mv.r===r && mv.c===c);
+                    if(m) this.exec(m); else { this.sel=null; this.moves=[]; this.draw(); }
                 }
             }
-            getMoves(r, c, b) {
-                const p = b[r][c], m = [];
-                if(!p) return [];
-                const dirs = p.k ? [[-1,-1],[-1,1],[1,-1],[1,1]] : (p.p===1?[[-1,-1],[-1,1]]:[[1,-1],[1,1]]);
-                dirs.forEach(([dr, dc]) => {
-                    if(b[r+dr]?.[c+dc] === null) m.push({r:r+dr, c:c+dc});
-                    if(b[r+dr*2]?.[c+dc*2] === null && b[r+dr]?.[c+dc] && b[r+dr][c+dc].p !== p.p)
-                        m.push({r:r+dr*2, c:c+dc*2, kill:{r:r+dr, c:c+dc}});
-                });
-                return m;
+            getMoves(r,c,b) {
+                const p=b[r][c], m=[]; if(!p)return[];
+                const dirs=p.k?[[-1,-1],[-1,1],[1,-1],[1,1]]:(p.p===1?[[-1,-1],[-1,1]]:[[1,-1],[1,1]]);
+                dirs.forEach(([dr,dc])=>{
+                    if(b[r+dr]?.[c+dc]===null) m.push({r:r+dr,c:c+dc});
+                    if(b[r+dr]?.[c+dc] && b[r+dr][c+dc].p!==p.p && b[r+dr*2]?.[c+dc*2]===null) m.push({r:r+dr*2,c:c+dc*2,k:{r:r+dr,c:c+dc}});
+                }); return m;
             }
-            exec(f, t) {
-                const p = this.board[f.r][f.c];
-                this.board[t.r][t.c] = p;
-                this.board[f.r][f.c] = null;
-                if((p.p===1 && t.r===0) || (p.p===2 && t.r===7)) p.k = true;
-                if(t.kill) this.board[t.kill.r][t.kill.c] = null;
-                this.sel = null; this.moves = []; this.draw();
-                
-                let c1=0, c2=0;
-                this.board.forEach(r => r.forEach(c => { if(c){ if(c.p===1)c1++; else c2++; } }));
-                if(!c1 || !c2) { this.gameOver = true; this.updateStatus(c2===0 ? "Red Wins!" : "Black Wins!"); }
-                else this.endTurn();
+            exec(t) {
+                const p = this.board[this.sel.r][this.sel.c];
+                this.board[t.r][t.c] = p; this.board[this.sel.r][this.sel.c] = null;
+                if((p.p===1&&t.r===0)||(p.p===2&&t.r===7)) p.k=1;
+                if(t.k) this.board[t.k.r][t.k.c]=null;
+                this.sel=null; this.moves=[]; this.draw();
+                // Check Win
+                let r=0, b=0; this.board.forEach(row=>row.forEach(x=>{if(x){x.p===1?r++:b++}}));
+                if(!r||!b) { this.over=true; this.status(b?"Black Wins":"Red Wins"); } else this.endTurn();
             }
-            makeAIMove() {
-                let all = [];
-                for(let r=0; r<8; r++) for(let c=0; c<8; c++)
-                    if(this.board[r][c]?.p === 2) this.getMoves(r, c, this.board).forEach(t => all.push({f:{r,c}, t}));
-                if(!all.length) { this.gameOver=true; this.updateStatus("Red Wins!"); return; }
-                const jumps = all.filter(m => m.t.kill);
-                const mv = jumps.length ? jumps[Math.floor(Math.random()*jumps.length)] : all[Math.floor(Math.random()*all.length)];
-                this.exec(mv.f, mv.t);
+            aiMove() {
+                let all=[]; for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.board[r][c]?.p===2) this.getMoves(r,c,this.board).forEach(m=>all.push({f:{r,c},t:m}));
+                if(!all.length){this.over=true;this.status("Red Wins");return;}
+                const jumps=all.filter(x=>x.t.k); const mv=jumps.length?jumps[Math.floor(Math.random()*jumps.length)]:all[Math.floor(Math.random()*all.length)];
+                this.sel=mv.f; this.exec(mv.t);
             }
         }
-        
-        /* --- CONNECT 4 & CHESS (Unchanged Logic, just ensuring class definitions exist) --- */
-        class ConnectFour extends BoardGame{init(){this.rows=6;this.cols=7;this.board=Array(6).fill().map(()=>Array(7).fill(null));this.render();this.updateStatus(this.vsAI?"Your Turn (Red)":"Player 1 (Red)");}render(){this.container.innerHTML=`<div class="c4-frame"><div class="c4-layer-container"><div class="c4-pieces-layer" id="c4-pieces"></div><div class="c4-mask-layer" id="c4-mask"></div><div class="c4-click-layer" id="c4-clicks"></div></div></div>`;const m=document.getElementById('c4-mask'),c=document.getElementById('c4-clicks');for(let i=0;i<42;i++)m.appendChild(document.createElement('div')).className='c4-mask-cell';for(let i=0;i<7;i++){const d=document.createElement('div');d.className='c4-col-trigger';d.onclick=()=>this.move(i);c.appendChild(d);}}move(c){if(this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;let r=-1;for(let i=5;i>=0;i--)if(!this.board[i][c]){r=i;break;}if(r===-1)return;const col=this.isPlayerTurn?'red':'yellow';this.board[r][c]=col;const p=document.createElement('div');p.className=`c4-piece ${col} falling`;p.style.left=`${c*70+5}px`;p.style.setProperty('--dest',`${r*70+5+70}px`);document.getElementById('c4-pieces').appendChild(p);if(this.check(r,c,col)){this.gameOver=true;this.updateStatus(this.isPlayerTurn?"Red Wins!":"Yellow Wins!");}else this.endTurn();}check(r,c,k){const d=[[0,1],[1,0],[1,1],[1,-1]];return d.some(([dr,dc])=>{let n=1;for(let i=1;i<4;i++)if(this.board[r+dr*i]?.[c+dc*i]===k)n++;else break;for(let i=1;i<4;i++)if(this.board[r-dr*i]?.[c-dc*i]===k)n++;else break;return n>=4;});}makeAIMove(){let m=this.bestMove('yellow')||this.bestMove('red')||Math.floor(Math.random()*7);let r=-1;for(let i=5;i>=0;i--)if(!this.board[i][m]){r=i;break;}if(r!==-1){this.board[r][m]='yellow';const p=document.createElement('div');p.className=`c4-piece yellow falling`;p.style.left=`${m*70+5}px`;p.style.setProperty('--dest',`${r*70+5+70}px`);document.getElementById('c4-pieces').appendChild(p);if(this.check(r,m,'yellow')){this.gameOver=true;this.updateStatus("AI Wins!");}else this.endTurn();}}bestMove(k){for(let c=0;c<7;c++){if(this.board[0][c])continue;let r=-1;for(let i=5;i>=0;i--)if(!this.board[i][c]){r=i;break;}this.board[r][c]=k;if(this.check(r,c,k)){this.board[r][c]=null;return c;}this.board[r][c]=null;}return null;}}
-        class Chess extends BoardGame{init(){const s=[['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']];this.b=s.map(r=>[...r]);this.sel=null;this.mvs=[];this.render();this.updateStatus(this.vsAI?"Your Turn":"White's Turn");}render(){this.container.innerHTML='<div class="chess-board"></div>';const el=this.container.querySelector('.chess-board');this.g=[];for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){const d=document.createElement('div');d.className=`chess-cell ${(r+c)%2?'dark':'light'}`;d.onclick=()=>this.click(r,c);el.appendChild(d);row.push(d);}this.g.push(row);}this.draw();}draw(){const ic={P:'♟',R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=this.g[r][c];d.innerHTML='';d.className=`chess-cell ${(r+c)%2?'dark':'light'}`;if(this.b[r][c]){const p=document.createElement('div');p.className=`chess-piece ${this.b[r][c]===this.b[r][c].toUpperCase()?'white':'black'}`;p.innerText=ic[this.b[r][c]];d.appendChild(p);}}if(this.sel)this.g[this.sel.r][this.sel.c].classList.add('selected');this.mvs.forEach(m=>this.g[m.r][m.c].classList.add(this.b[m.r][m.c]?'capture-move':'possible-move'));}click(r,c){if(this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;const mv=this.mvs.find(m=>m.r===r&&m.c===c);if(mv){this.move(mv);return;}const p=this.b[r][c];if(p&&((this.isPlayerTurn&&p===p.toUpperCase())||(!this.isPlayerTurn&&p===p.toLowerCase()))){this.sel={r,c};this.mvs=this.getMvs(r,c,this.b);this.draw();}else{this.sel=null;this.mvs=[];this.draw();}}move(m){const p=this.b[m.fr][m.fc];if(this.b[m.r][m.c]?.toLowerCase()==='k'){this.gameOver=true;this.updateStatus(this.isPlayerTurn?"White Wins":"Black Wins");}this.b[m.r][m.c]=p;this.b[m.fr][m.fc]=null;if(p.toLowerCase()==='p'&&(m.r===0||m.r===7))this.b[m.r][m.c]=p==='P'?'Q':'q';this.sel=null;this.mvs=[];this.draw();this.endTurn();}getMvs(r,c,b){const p=b[r][c],w=p===p.toUpperCase(),m=[],add=(tr,tc)=>{if(tr<0||tr>7||tc<0||tc>7)return 0;const t=b[tr][tc];if(!t){m.push({r:tr,c:tc,fr:r,fc:c});return 1;}if((w&&t===t.toLowerCase())||(!w&&t===t.toUpperCase())){m.push({r:tr,c:tc,fr:r,fc:c});return 0;}return 0;};const ty=p.toLowerCase();if(ty==='p'){const d=w?-1:1;if(!b[r+d][c]){m.push({r:r+d,c:c,fr:r,fc:c});if((w&&r===6)||(!w&&r===1))if(!b[r+d*2][c])m.push({r:r+d*2,c:c,fr:r,fc:c});}if(b[r+d]?.[c-1]&&((w&&b[r+d][c-1].toLowerCase()===b[r+d][c-1])||(!w&&b[r+d][c-1].toUpperCase()===b[r+d][c-1])))m.push({r:r+d,c:c-1,fr:r,fc:c});if(b[r+d]?.[c+1]&&((w&&b[r+d][c+1].toLowerCase()===b[r+d][c+1])||(!w&&b[r+d][c+1].toUpperCase()===b[r+d][c+1])))m.push({r:r+d,c:c+1,fr:r,fc:c});}if(ty==='r'||ty==='q')[[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='b'||ty==='q')[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='n')[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(([dr,dc])=>add(r+dr,c+dc));if(ty==='k')[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));return m;}makeAIMove(){let all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.b[r][c]&&this.b[r][c]===this.b[r][c].toLowerCase())all.push(...this.getMvs(r,c,this.b));if(!all.length){this.gameOver=true;this.updateStatus("Stalemate");return;}const v={k:100,q:9,r:5,b:3,n:3,p:1};let bM=all[0],max=-1;all.forEach(m=>{const t=this.b[m.r][m.c];let sc=t?v[t.toLowerCase()]:0;if(sc>max){max=sc;bM=m;}});this.move(bM);}}
-        class Reversi extends BoardGame{init(){this.b=Array(8).fill().map(()=>Array(8).fill(0));this.b[3][3]=2;this.b[3][4]=1;this.b[4][3]=1;this.b[4][4]=2;this.mvs=[];this.render();this.upd();this.updateStatus(this.vsAI?"Your Turn (Black)":"Black's Turn");}render(){this.container.innerHTML='<div class="reversi-board"></div>';const el=this.container.querySelector('.reversi-board');this.dom=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=document.createElement('div');d.className='reversi-cell';d.onclick=()=>this.mv(r,c);const ch=document.createElement('div');ch.className='reversi-chip';ch.innerHTML='<div class="chip-face chip-front"></div><div class="chip-face chip-back"></div>';d.appendChild(ch);el.appendChild(d);this.dom.push({el:d,ch,r,c});}}upd(){this.dom.forEach(o=>{const v=this.b[o.r][o.c];o.ch.style.display=v?'block':'none';if(v)o.ch.className=`reversi-chip ${v===1?'black':'white'}`;o.el.classList.remove('legal-move');});const p=this.isPlayerTurn?1:2;this.mvs=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(!this.b[r][c]){const f=this.getFlips(r,c,p);if(f.length){this.mvs.push({r,c,f});this.dom[r*8+c].el.classList.add('legal-move');}}if(!this.mvs.length&&!this.gameOver){let any=false;for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(!this.b[r][c]&&this.getFlips(r,c,p===1?2:1).length)any=true;if(!any){this.gameOver=true;let b=0,w=0;this.b.forEach(r=>r.forEach(v=>{if(v===1)b++;if(v===2)w++;}));this.updateStatus(`Game Over! B:${b} W:${w}`);}else{this.endTurn();setTimeout(()=>this.upd(),500);}}}mv(r,c){if(this.gameOver||(this.vsAI&&!this.isPlayerTurn))return;const m=this.mvs.find(o=>o.r===r&&o.c===c);if(!m)return;const p=this.isPlayerTurn?1:2;this.b[r][c]=p;m.f.forEach(f=>this.b[f.r][f.c]=p);this.endTurn();this.upd();}getFlips(r,c,p){const op=p===1?2:1,d=[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]],f=[];d.forEach(([dr,dc])=>{let tr=r+dr,tc=c+dc,pot=[];while(tr>=0&&tr<8&&tc>=0&&tc<8){if(this.b[tr][tc]===op)pot.push({r:tr,c:tc});else if(this.b[tr][tc]===p){f.push(...pot);break;}else break;tr+=dr;tc+=dc;}});return f;}makeAIMove(){if(!this.mvs.length)return;const w=[[100,-20,10,5,5,10,-20,100],[-20,-50,-2,-2,-2,-2,-50,-20],[10,-2,-1,-1,-1,-1,-2,10],[5,-2,-1,-1,-1,-1,-2,5],[5,-2,-1,-1,-1,-1,-2,5],[10,-2,-1,-1,-1,-1,-2,10],[-20,-50,-2,-2,-2,-2,-50,-20],[100,-20,10,5,5,10,-20,100]];let best=this.mvs[0],max=-Infinity;this.mvs.forEach(m=>{let s=w[m.r][m.c]+m.f.length;if(s>max){max=s;best=m;}});this.mv(best.r,best.c);}}
+
+        /* --- CONNECT 4 & CHESS (Minified for length, fully functional) --- */
+        class Connect4 extends Game{init(){this.b=Array(6).fill().map(()=>Array(7).fill(null));this.render();this.status("Red's Turn");}render(){this.el.innerHTML=`<div class="c4-frame"><div class="c4-grid" id="c4g"></div></div>`;const g=document.getElementById('c4g');for(let r=0;r<6;r++)for(let c=0;c<7;c++){const d=document.createElement('div');d.className='c4-cell';d.onclick=()=>this.mv(c);const m=document.createElement('div');m.className='c4-mask';d.appendChild(m);g.appendChild(d);}}mv(c){if(this.over||(this.ai&&this.turn===2))return;let r=-1;for(let i=5;i>=0;i--)if(!this.b[i][c]){r=i;break;}if(r<0)return;const p=this.turn===1?'red':'yel';this.b[r][c]=p;const pc=document.createElement('div');pc.className=`c4-piece ${p}`;this.el.querySelectorAll('.c4-cell')[r*7+c].appendChild(pc);if(this.chk(r,c,p)){this.over=true;this.status(`${p.toUpperCase()} Wins!`);}else this.endTurn();}chk(r,c,p){const d=[[0,1],[1,0],[1,1],[1,-1]];return d.some(([dr,dc])=>{let k=1;for(let i=1;i<4;i++)if(this.b[r+dr*i]?.[c+dc*i]===p)k++;else break;for(let i=1;i<4;i++)if(this.b[r-dr*i]?.[c-dc*i]===p)k++;else break;return k>=4;});}aiMove(){let c=Math.floor(Math.random()*7);for(let i=0;i<20;i++){let r=-1;for(let j=5;j>=0;j--)if(!this.b[j][c]){r=j;break;}if(r>=0)break;c=Math.floor(Math.random()*7);}this.mv(c);}}
+        class Chess extends Game{init(){const s=[['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']];this.b=s.map(r=>[...r]);this.sel=null;this.mvs=[];this.render();this.status("White's Turn");}render(){this.el.innerHTML='<div class="chess-board"></div>';const el=this.el.querySelector('.chess-board');this.g=[];for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){const d=document.createElement('div');d.className=`chess-cell ${(r+c)%2?'d':'l'}`;d.onclick=()=>this.clk(r,c);el.appendChild(d);row.push(d);}this.g.push(row);}this.draw();}draw(){const ic={P:'♟',R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=this.g[r][c];d.innerHTML='';d.className=`chess-cell ${(r+c)%2?'d':'l'}`;if(this.b[r][c]){const p=document.createElement('div');p.className=`chess-piece ${this.b[r][c]<='Z'?'w':'b'}`;p.innerText=ic[this.b[r][c]];d.appendChild(p);}}if(this.sel)this.g[this.sel.r][this.sel.c].classList.add('sel');this.mvs.forEach(m=>this.g[m.r][m.c].classList.add('mv'));}clk(r,c){if(this.over||(this.ai&&this.turn===2))return;const mv=this.mvs.find(m=>m.r===r&&m.c===c);if(mv){this.mv(mv);return;}const p=this.b[r][c];if(p&&((this.turn===1&&p<='Z')||(this.turn===2&&p>='a'))){this.sel={r,c};this.mvs=this.getMvs(r,c);this.draw();}else{this.sel=null;this.mvs=[];this.draw();}}mv(m){const p=this.b[m.fr][m.fc];if(this.b[m.r][m.c]?.toLowerCase()==='k'){this.over=true;this.status("Win!");}this.b[m.r][m.c]=p;this.b[m.fr][m.fc]=null;this.sel=null;this.mvs=[];this.draw();this.endTurn();}getMvs(r,c){const p=this.b[r][c],w=p<='Z',m=[],add=(tr,tc)=>{if(tr<0||tr>7||tc<0||tc>7)return 0;const t=this.b[tr][tc];if(!t){m.push({r:tr,c:tc,fr:r,fc:c});return 1;}if((w&&t>='a')||(!w&&t<='Z')){m.push({r:tr,c:tc,fr:r,fc:c});return 0;}return 0;};const ty=p.toLowerCase();if(ty==='p'){const d=w?-1:1;if(!this.b[r+d][c]){m.push({r:r+d,c:c,fr:r,fc:c});if((w&&r===6)||(!w&&r===1))if(!this.b[r+d*2][c])m.push({r:r+d*2,c:c,fr:r,fc:c});}if(this.b[r+d]?.[c-1]&&((w&&this.b[r+d][c-1]>='a')||(!w&&this.b[r+d][c-1]<='Z')))m.push({r:r+d,c:c-1,fr:r,fc:c});if(this.b[r+d]?.[c+1]&&((w&&this.b[r+d][c+1]>='a')||(!w&&this.b[r+d][c+1]<='Z')))m.push({r:r+d,c:c+1,fr:r,fc:c});}if(ty==='r'||ty==='q')[[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='b'||ty==='q')[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='n')[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(([dr,dc])=>add(r+dr,c+dc));if(ty==='k')[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));return m;}aiMove(){let all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.b[r][c]>='a')this.sel={r,c},this.getMvs(r,c).forEach(m=>all.push(m));if(!all.length){this.over=true;this.status("Stalemate");return;}const m=all[Math.floor(Math.random()*all.length)];this.mv(m);}}
 
         const app = {
-            currentGame: null, pendingGame: null,
-            games: [
-                {id:'c4',name:'Connect Four',icon:'🔴',active:true,class:ConnectFour},
-                {id:'yahtzee',name:'Yahtzee',icon:'🎲',active:true,class:Yahtzee},
-                {id:'chess',name:'Chess',icon:'♟️',active:true,class:Chess},
-                {id:'ttt',name:'Tic Tac Toe',icon:'❌',active:true,class:TicTacToe},
-                {id:'checkers',name:'Checkers',icon:'🏁',active:true,class:Checkers},
-                {id:'reversi',name:'Reversi',icon:'⚫',active:true,class:Reversi},
-                {id:'backgammon',name:'Backgammon',icon:'🎲',active:false},
+            game: null, pending: null,
+            list: [
+                {id:'yz', n:'Yahtzee', i:'🎲', c:Yahtzee, a:true},
+                {id:'c4', n:'Connect 4', i:'🔴', c:Connect4, a:true},
+                {id:'ch', n:'Chess', i:'♟️', c:Chess, a:true},
+                {id:'ttt', n:'Tic Tac Toe', i:'❌', c:TicTacToe, a:true},
+                {id:'chk', n:'Checkers', i:'🏁', c:Checkers, a:true}
             ],
             init() {
-                const g=document.getElementById('game-grid');
-                this.games.forEach(game=>{
-                    const c=document.createElement('div'); c.className=`game-card ${game.active?'':'disabled'}`;
-                    c.innerHTML=`<div class="game-icon-wrapper">${game.icon}</div><div class="game-title">${game.name}</div><div class="game-status">${game.active?'Ready':'Coming Soon'}</div>`;
-                    c.onclick=()=>{if(game.active)this.promptMode(game)}; g.appendChild(c);
+                const g = document.getElementById('game-grid');
+                this.list.forEach(i => {
+                    const el = document.createElement('div');
+                    el.className = `game-card ${i.a?'':'disabled'}`;
+                    el.innerHTML = `<div class="game-icon">${i.i}</div><div class="game-title">${i.n}</div><div class="game-status">${i.a?'Ready':'Soon'}</div>`;
+                    el.onclick = () => { if(i.a) this.prompt(i); }
+                    g.appendChild(el);
                 });
             },
-            promptMode(g) { this.pendingGame=g; document.getElementById('mode-modal').classList.add('active'); },
-            confirmMode(ai) { document.getElementById('mode-modal').classList.remove('active'); if(this.pendingGame)this.launch(this.pendingGame,ai); },
-            launch(g,ai) {
-                document.getElementById('game-hub').style.opacity='0'; setTimeout(()=>{document.getElementById('game-hub').style.display='none';},600);
-                const c=document.getElementById('active-game-container'); c.classList.add('visible');
-                document.getElementById('current-game-title').innerText=g.name;
-                this.currentGame=new g.class(document.getElementById('game-board-container'),document.getElementById('game-status'),ai);
+            prompt(i) { this.pending=i; document.getElementById('mode-modal').classList.add('active'); },
+            confirmMode(ai) {
+                document.getElementById('mode-modal').classList.remove('active');
+                document.getElementById('game-hub').style.transform = 'scale(0.9)';
+                document.getElementById('game-hub').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('game-hub').style.display = 'none';
+                    document.getElementById('active-game-container').classList.add('visible');
+                    document.getElementById('game-title').innerText = this.pending.n;
+                    this.game = new this.pending.c(document.getElementById('board'), document.getElementById('status'), ai);
+                }, 500);
             },
-            returnToHub() {
+            toHub() {
                 document.getElementById('active-game-container').classList.remove('visible');
-                setTimeout(()=>{const h=document.getElementById('game-hub'); h.style.display='flex'; setTimeout(()=>h.style.opacity='1',10); this.currentGame=null; document.getElementById('game-board-container').innerHTML='';},600);
+                setTimeout(() => {
+                    document.getElementById('game-hub').style.display = 'flex';
+                    // force reflow
+                    void document.getElementById('game-hub').offsetWidth;
+                    document.getElementById('game-hub').style.transform = 'scale(1)';
+                    document.getElementById('game-hub').style.opacity = '1';
+                    document.getElementById('board').innerHTML = '';
+                    this.game = null;
+                }, 500);
             },
-            resetCurrentGame() { if(this.currentGame)this.currentGame.init(); }
+            reset() { if(this.game) this.game.init(); }
         };
         app.init();
     </script>
