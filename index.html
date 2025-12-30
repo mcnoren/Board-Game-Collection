@@ -4,588 +4,614 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Clubhouse Deluxe v9</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Cinzel:wght@700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&family=Chivo+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE THEME --- */
+        /* --- CORE VISUALS --- */
         :root {
-            --wood-dark: #221510;
-            --wood-mid: #5d4037;
-            --wood-light: #8d6e63;
-            --felt-green: #144818;
-            --felt-pattern: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 0, transparent 50%);
-            --ivory: #fcfbf7;
-            --gold: #ffc107;
-            --shadow-deep: 0 10px 30px rgba(0,0,0,0.6);
-            --font-main: 'Inter', sans-serif;
-            --font-header: 'Cinzel', serif;
-            --font-mono: 'JetBrains Mono', monospace;
+            --wood-dark: #2d1b18;
+            --wood-light: #5d4037;
+            --wood-grain: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(90)" opacity="0.1" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h100v100H0z"/><path fill="%23fff" d="M0 0h100v2H0zM0 10h100v1H0zM0 25h100v3H0z" opacity="0.5"/></svg>');
+            --felt-green: #1b5e20;
+            --felt-texture: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwquNvLM0YHEEMdDCkAQBmWxL/m57O5AAAAABJRU5ErkJggg==');
+            --accent-gold: #ffc107;
+            --font-ui: 'Rubik', sans-serif;
+            --font-fancy: 'Cinzel Decorative', serif;
+            --font-mono: 'Chivo Mono', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: var(--font-main);
-            background: #1a1a1a;
-            background-image: radial-gradient(circle, #3e2723 0%, #1a0f0d 100%);
-            height: 100vh; overflow: hidden; color: #eee;
-            display: flex; justify-content: center; align-items: center;
+            font-family: var(--font-ui);
+            background-color: var(--wood-dark);
+            background-image: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.8) 100%), var(--wood-grain);
+            height: 100vh; overflow: hidden; color: #fff;
+            display: flex; justify-content: center; align-items: center; perspective: 1200px;
         }
 
         /* --- MENUS --- */
-        #hub {
-            width: 95%; max-width: 1200px; height: 90vh;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px); border-radius: 24px;
-            display: flex; flex-direction: column; padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            transition: all 0.5s ease;
+        #mode-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            z-index: 100; display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
+        #mode-modal.active { opacity: 1; pointer-events: all; }
+        .mode-card {
+            background: linear-gradient(145deg, var(--wood-light), var(--wood-dark));
+            padding: 40px; border-radius: 20px; border: 2px solid var(--accent-gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9); text-align: center; transform: scale(0.9); transition: transform 0.3s;
+        }
+        #mode-modal.active .mode-card { transform: scale(1); }
+        .mode-title { font-family: var(--font-fancy); font-size: 2rem; color: var(--accent-gold); margin-bottom: 30px; }
+        .mode-btn-group { display: flex; gap: 20px; }
+
+        /* --- HUB --- */
+        #game-hub {
+            width: 95%; max-width: 1100px; height: 85vh;
+            background: linear-gradient(to bottom, #4e342e, #2d1b18);
+            border-radius: 15px; padding: 30px; display: flex; flex-direction: column;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8), 0 30px 50px rgba(0,0,0,0.6);
+            border: 8px solid #3e2723; transition: transform 0.6s, opacity 0.6s; z-index: 10;
+        }
+        .hub-header { text-align: center; margin-bottom: 20px; font-family: var(--font-fancy); font-size: 3.5rem; color: var(--accent-gold); text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); grid-gap: 25px; overflow-y: auto; padding: 20px; }
+        .game-grid::-webkit-scrollbar { width: 8px; background: rgba(0,0,0,0.3); }
+        .game-grid::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 4px; }
         
-        .header { font-family: var(--font-header); font-size: 3rem; color: var(--gold); text-align: center; margin-bottom: 40px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); letter-spacing: 2px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; overflow-y: auto; padding: 10px; }
-        .card {
-            background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
-            border-radius: 16px; height: 220px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        .game-card {
+            background: #fff; color: #333;
+            border-radius: 15px; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; box-shadow: 0 8px 0 #bdbdbd, 0 15px 20px rgba(0,0,0,0.4);
+            transition: transform 0.2s; border: 4px solid #fff;
         }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: var(--gold); }
-        .card-icon { font-size: 4.5rem; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
-        .card-title { font-weight: 600; font-size: 1.2rem; color: #fff; }
-        
-        /* --- GAME CONTAINER --- */
-        #app-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 100;
-            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-            display: flex; flex-direction: column;
-        }
-        #app-container.active { transform: translateY(0); }
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 13px 0 #bdbdbd, 0 25px 30px rgba(0,0,0,0.5); z-index: 5; }
+        .game-card.disabled { filter: grayscale(100%); opacity: 0.6; pointer-events: none; background: #e0e0e0; box-shadow: none; transform: none; }
+        .game-icon { font-size: 4rem; margin-bottom: 10px; }
+        .game-title { font-weight: 800; font-size: 1.2rem; }
+        .game-status { font-size: 0.8rem; font-weight: bold; color: #777; margin-top: 5px; text-transform: uppercase; }
 
-        .navbar {
-            height: 70px; background: #151515; border-bottom: 1px solid #333;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 30px;
-        }
-        .nav-title { font-family: var(--font-header); font-size: 1.5rem; color: var(--gold); }
-        .btn {
-            background: #333; color: #fff; border: none; padding: 10px 20px;
-            border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
-        }
-        .btn:hover { background: #444; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-gold:hover { background: #ffca28; }
-
-        .stage { flex: 1; position: relative; overflow: hidden; background: #111; display: flex; justify-content: center; align-items: center; }
-
-        /* --- YAHTZEE DELUXE --- */
-        .yz-table {
-            width: 100%; height: 100%;
-            display: flex; gap: 0; background: #0e0e0e;
-        }
-
-        /* LEFT: THE TRAY */
-        .yz-area {
-            flex: 2; display: flex; flex-direction: column; position: relative;
-            background: var(--wood-dark);
-            border-right: 4px solid #000;
-            box-shadow: inset -10px 0 20px rgba(0,0,0,0.5);
-        }
-
-        /* Top Rack (Held Dice) */
-        .yz-rack {
-            height: 140px; background: linear-gradient(to bottom, #3e2723, #281712);
-            border-bottom: 8px solid #1a100d;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 10;
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-            padding: 0 20px;
-        }
-        .yz-rack-slot {
-            width: 90px; height: 90px;
-            background: inset 0 2px 5px rgba(0,0,0,0.8);
-            border-radius: 12px;
-            border: 2px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.2);
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* Felt Rolling Area */
-        .yz-felt {
-            flex: 1; position: relative;
+        /* --- ACTIVE GAME CONTAINER --- */
+        #active-game-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--felt-green);
-            background-image: var(--felt-pattern), radial-gradient(circle, transparent, rgba(0,0,0,0.6));
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
-            display: flex; justify-content: center; align-items: center;
-            perspective: 1000px;
-            overflow: hidden;
+            background-image: var(--felt-texture);
+            box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+            transform: translateY(100%); opacity: 0; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; z-index: 20;
+        }
+        #active-game-container.visible { transform: translateY(0); opacity: 1; }
+        
+        .game-navbar {
+            padding: 15px 40px; background: #212121;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: flex; justify-content: space-between; align-items: center; color: #fff;
+            border-bottom: 2px solid var(--accent-gold);
+        }
+        .btn {
+            padding: 12px 25px; border: none; background: linear-gradient(to bottom, #ffca28, #ff6f00);
+            color: #3e2723; font-family: var(--font-ui); font-weight: 800; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 4px 0 #e65100, 0 5px 10px rgba(0,0,0,0.3); transition: transform 0.1s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn:active { transform: translateY(2px); box-shadow: 0 0px 0 #e65100; }
+        
+        .game-area { flex: 1; display: flex; justify-content: center; align-items: center; flex-direction: column; position: relative; padding: 20px; perspective: 1000px; }
+        .status-display {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; background: rgba(0,0,0,0.7);
+            color: var(--accent-gold); padding: 10px 40px; border-radius: 50px; border: 2px solid var(--accent-gold);
+            text-align: center; min-width: 300px;
+        }
+
+        /* --- YAHTZEE LAYOUT FIX --- */
+        .yz-layout { 
+            display: flex; gap: 30px; width: 95%; max-width: 1100px; height: 80%; 
+            background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px;
+        }
+        .yz-board { 
+            flex: 2; display: flex; flex-direction: column; 
+            background: #1b5e20; border: 15px solid #3e2723; border-radius: 15px; 
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
         }
         
-        /* Dice Container Grid for Spacing */
-        .yz-rolling-grid {
-            display: grid; grid-template-columns: repeat(5, 100px); gap: 20px;
-            width: 100%; height: 100%;
-            justify-content: center; align-content: center;
-            pointer-events: none; /* Let clicks pass to dice */
+        /* Updated Tray CSS for spreading dice */
+        .yz-tray {
+            flex: 1; position: relative; perspective: 1200px; 
+            display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;
+            width: 100%; padding: 0 40px;
         }
-        .yz-grid-cell { width: 100px; height: 100px; display: flex; justify-content: center; align-items: center; perspective: 600px; }
 
         .yz-controls {
-            height: 100px; background: #222;
-            display: flex; justify-content: center; align-items: center;
-            border-top: 1px solid #444;
+            height: 80px; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+            border-top: 2px solid rgba(255,255,255,0.1);
         }
-        .roll-btn {
-            width: 200px; height: 60px; font-size: 1.2rem; border-radius: 30px;
-            background: linear-gradient(to bottom, #ffc107, #ff8f00);
-            border: none; font-weight: 800; color: #3e2723;
-            box-shadow: 0 5px 0 #e65100, 0 10px 20px rgba(0,0,0,0.5);
-            cursor: pointer; transition: all 0.1s; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .roll-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #e65100; }
-        .roll-btn:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.5; }
 
-        /* RIGHT: SCORECARD */
-        .yz-sidebar {
-            flex: 1; max-width: 400px; background: #d7ccc8;
-            display: flex; flex-direction: column;
-            border-left: 2px solid #000;
+        /* 3D Dice Wrappers */
+        .die-wrap {
+            width: 80px; height: 80px; position: relative; cursor: pointer;
+            transition: transform 0.2s;
+            /* No absolute positioning here to allow flexbox spacing */
         }
-        .scorecard {
-            flex: 1; overflow-y: auto; padding: 20px;
-            font-family: var(--font-mono); color: #333;
+        .die-wrap:hover { transform: scale(1.05); }
+        .die-wrap.held { transform: translateY(-25px); }
+        .die-wrap.held::after {
+            content: 'HELD'; position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+            font-size: 14px; font-weight: bold; color: var(--accent-gold); background: #000; padding: 4px 8px; border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .score-header { display: flex; font-weight: 900; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 10px; font-size: 1.1rem; }
-        .score-row { display: flex; padding: 8px 5px; border-bottom: 1px dashed #aaa; cursor: pointer; align-items: center; transition: background 0.1s;}
-        .score-row:hover:not(.locked) { background: #fff; }
-        .score-row.locked { color: #888; cursor: default; }
-        .sc-cat { flex: 2; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        .sc-val { flex: 1; text-align: center; font-weight: bold; font-size: 1.1rem; }
-        .sc-box { width: 40px; height: 30px; display: flex; justify-content: center; align-items: center; border-radius: 4px; border: 1px solid #bbb; background: #f5f5f5; }
-        .sc-box.fill { background: transparent; border: none; }
-        .p1-col .sc-box { background: #e3f2fd; border-color: #2196f3; }
-        .p2-col .sc-box { background: #ffebee; border-color: #f44336; }
 
-        /* --- 3D DICE --- */
         .die {
-            width: 70px; height: 70px; position: relative;
-            transform-style: preserve-3d; cursor: pointer; pointer-events: auto;
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            width: 100%; height: 100%; position: absolute; transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .die.rolling { animation: chaos 0.5s linear infinite; }
-        
+        .die.rolling { animation: tumble 0.5s linear infinite; }
+
         .face {
-            position: absolute; width: 70px; height: 70px;
-            background: radial-gradient(circle at 30% 30%, #fff, #ddd);
-            border-radius: 12px; border: 1px solid #ccc;
+            position: absolute; width: 80px; height: 80px; 
+            background: radial-gradient(circle at center, #f5f5f5, #e0e0e0);
+            border-radius: 12px;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid #ccc;
         }
-        /* Pips */
-        .pip {
-            position: absolute; width: 14px; height: 14px; background: #111; border-radius: 50%;
-            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.8);
+        .dot {
+            position: absolute; width: 16px; height: 16px; background: #222; border-radius: 50%;
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.8);
         }
+        /* Face Transforms */
+        .f1 { transform: translateZ(40px); }
+        .f2 { transform: rotateY(180deg) translateZ(40px); }
+        .f3 { transform: rotateY(90deg) translateZ(40px); }
+        .f4 { transform: rotateY(-90deg) translateZ(40px); }
+        .f5 { transform: rotateX(90deg) translateZ(40px); }
+        .f6 { transform: rotateX(-90deg) translateZ(40px); }
         
-        /* 3D Box Construction */
-        .f1 { transform: translateZ(35px); }
-        .f6 { transform: rotateY(180deg) translateZ(35px); }
-        .f2 { transform: rotateX(-90deg) translateZ(35px); }
-        .f5 { transform: rotateX(90deg) translateZ(35px); }
-        .f3 { transform: rotateY(90deg) translateZ(35px); }
-        .f4 { transform: rotateY(-90deg) translateZ(35px); }
+        .c { top:32px; left:32px; } .tl { top:10px; left:10px; } .tr { top:10px; right:10px; }
+        .bl { bottom:10px; left:10px; } .br { bottom:10px; right:10px; } .ml { top:32px; left:10px; } .mr { top:32px; right:10px; }
 
-        /* Pip Positions */
-        .c { top:28px; left:28px; }
-        .tl { top:10px; left:10px; } .tr { top:10px; right:10px; }
-        .bl { bottom:10px; left:10px; } .br { bottom:10px; right:10px; }
-        .ml { top:28px; left:10px; } .mr { top:28px; right:10px; }
-
-        @keyframes chaos {
-            0% { transform: rotate3d(1, 1, 1, 0deg); }
-            100% { transform: rotate3d(1, 2, 0, 360deg); }
+        @keyframes tumble {
+            0% { transform: rotate3d(1,1,1,0deg); }
+            100% { transform: rotate3d(1,2,0,360deg); }
         }
 
-        /* --- OTHER BOARDS --- */
-        .t-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 400px; height: 400px; background: var(--wood-light); padding: 10px; border-radius: 10px; }
-        .t-cell { background: var(--wood-dark); border-radius: 5px; display: flex; justify-content: center; align-items: center; font-size: 5rem; cursor: pointer; box-shadow: inset 0 0 20px #000; }
-        .chk-board { display: grid; grid-template-columns: repeat(8, 1fr); width: 480px; height: 480px; border: 10px solid var(--wood-dark); }
-        .chk-c { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .chk-c.b { background: #3e2723; } .chk-c.w { background: #d7ccc8; }
-        .chk-p { width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 5px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); }
-        .chk-p.r { background: radial-gradient(#d32f2f, #b71c1c); } .chk-p.blk { background: radial-gradient(#424242, #212121); }
-        .c4-board { background: #01579b; padding: 15px; border-radius: 10px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .c4-c { width: 60px; height: 60px; background: #0277bd; border-radius: 50%; position: relative; cursor: pointer; }
-        .c4-p { width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .c4-p.r { background: #d32f2f; } .c4-p.y { background: #fbc02d; }
+        /* Scorecard */
+        .yz-scorecard {
+            flex: 1; background: #fff8e1; border-radius: 5px; color: #333;
+            font-family: var(--font-mono); font-size: 0.9rem;
+            display: flex; flex-direction: column; border: 1px solid #ccc;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .yz-header { display: flex; background: #3e2723; color: #fff; padding: 10px; font-weight: bold; }
+        .yz-cell { flex: 1; text-align: center; } .yz-cell.wide { flex: 2; text-align: left; }
+        .yz-row { display: flex; border-bottom: 1px solid #ddd; padding: 6px 10px; cursor: pointer; transition: background 0.1s; }
+        .yz-row:hover:not(.locked) { background: #ffe082; }
+        .yz-row.locked { color: #888; cursor: default; background: #eee; }
+        .yz-val { font-weight: bold; }
+        .yz-total { background: #5d4037; color: #fff; font-weight: bold; }
+        
+        /* --- OTHER GAMES --- */
+        .ttt-board { display: grid; grid-template-columns: repeat(3, 120px); gap: 10px; background: #8d6e63; padding: 10px; border-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .ttt-cell { width: 120px; height: 120px; background: #3e2723; display: flex; justify-content: center; align-items: center; font-size: 5rem; font-family: var(--font-fancy); cursor: pointer; position: relative; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        .ttt-cell:hover { background: #4e342e; }
+        .ttt-piece { position: absolute; transform: scale(0); animation: pop 0.3s forwards; }
+        .ttt-piece.x { color: #ef5350; text-shadow: 0 2px 10px rgba(239, 83, 80, 0.4); }
+        .ttt-piece.o { color: #42a5f5; text-shadow: 0 2px 10px rgba(66, 165, 245, 0.4); }
+        @keyframes pop { to { transform: scale(1); } }
+
+        .chk-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #5d4037; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .chk-cell { width: 60px; height: 60px; position: relative; }
+        .chk-cell.w { background: #d7ccc8; } .chk-cell.b { background: #5d4037; }
+        .chk-cell.highlight::after { content:''; position: absolute; top:0; left:0; width:100%; height:100%; box-shadow: inset 0 0 0 3px #76ff03; }
+        .chk-piece { width: 50px; height: 50px; border-radius: 50%; position: absolute; top:5px; left:5px; box-shadow: 0 4px 6px rgba(0,0,0,0.6); cursor: pointer; transition: transform 0.2s; display: flex; justify-content: center; align-items: center;}
+        .chk-piece:hover { transform: scale(1.1); }
+        .chk-piece.p1 { background: radial-gradient(circle at 30% 30%, #e53935, #b71c1c); border: 2px solid #ef9a9a; }
+        .chk-piece.p2 { background: radial-gradient(circle at 30% 30%, #424242, #212121); border: 2px solid #757575; }
+        .chk-piece.king::after { content: '♛'; color: gold; font-size: 30px; drop-shadow: 0 2px 2px rgba(0,0,0,0.8); }
+
+        .c4-frame { padding: 15px; background: #01579b; border-radius: 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .c4-grid { display: grid; grid-template-columns: repeat(7, 70px); grid-template-rows: repeat(6, 70px); background: #0277bd; border-radius: 5px; }
+        .c4-cell { width: 70px; height: 70px; position: relative; cursor: pointer; }
+        .c4-mask { position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle, transparent 28px, #0277bd 29px); z-index: 10; pointer-events: none; }
+        .c4-piece { width: 60px; height: 60px; border-radius: 50%; position: absolute; top: 5px; left: 5px; z-index: 5; }
+        .c4-piece.red { background: #d32f2f; } .c4-piece.yel { background: #fbc02d; }
+        
+        .chess-board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 15px solid #3e2723; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .chess-cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; font-size: 40px; cursor: pointer; }
+        .chess-cell.l { background: #d7ccc8; } .chess-cell.d { background: #8d6e63; }
+        .chess-cell.sel { background: #ffeb3b; }
+        .chess-cell.mv::after { content:''; width:15px; height:15px; background:rgba(0,0,0,0.3); border-radius:50%; }
+        .chess-piece { filter: drop-shadow(0 3px 2px rgba(0,0,0,0.4)); }
+        .chess-piece.w { color: #fff; text-shadow: 0 1px #999; } .chess-piece.b { color: #000; }
+
     </style>
 </head>
 <body>
 
     <div id="mode-modal">
         <div class="mode-card">
-            <div class="mode-title">Game Options</div>
+            <div class="mode-title">Select Mode</div>
             <div class="mode-btn-group">
-                <button class="btn btn-gold" onclick="engine.start(true)">VS Computer</button>
-                <button class="btn" onclick="engine.start(false)">2 Players</button>
+                <button class="btn" onclick="app.confirmMode(true)">Vs AI</button>
+                <button class="btn" onclick="app.confirmMode(false)">2 Players</button>
             </div>
         </div>
     </div>
 
-    <div id="hub">
-        <div class="header">Clubhouse Deluxe</div>
-        <div class="grid" id="game-list"></div>
+    <div id="game-hub">
+        <div class="hub-header">Clubhouse Deluxe</div>
+        <div class="game-grid" id="game-grid"></div>
     </div>
 
-    <div id="app-container">
-        <div class="navbar">
-            <button class="btn" onclick="engine.exit()">Exit</button>
-            <div class="nav-title" id="nav-title">Yahtzee</div>
-            <button class="btn btn-gold" onclick="engine.reset()">Reset</button>
+    <div id="active-game-container">
+        <div class="game-navbar">
+            <button class="btn" onclick="app.toHub()">← Library</button>
+            <h2 id="game-title">Game</h2>
+            <button class="btn" onclick="app.reset()">Reset</button>
         </div>
-        <div class="stage" id="stage"></div>
+        <div class="game-area">
+            <div class="status-display" id="status">Ready</div>
+            <div id="board"></div>
+        </div>
     </div>
 
     <script>
-        // --- BASE CLASS ---
+        // --- BASE ENGINE ---
         class Game {
-            constructor(stage, ai) { this.stage=stage; this.ai=ai; this.turn=1; this.over=false; this.init(); }
-            status(m) { const el=document.getElementById('nav-title'); if(el)el.innerText=m; }
-            wait(cb,t=1000){setTimeout(cb,t);}
-            endTurn(){this.turn=this.turn===1?2:1; if(this.over)return; const p=this.turn===1?"P1":(this.ai?"CPU":"P2"); this.status(`${p}'s Turn`); if(this.ai&&this.turn===2)this.aiMove();}
-            aiMove(){console.log("AI Move");}
+            constructor(el, st, ai) { this.el=el; this.st=st; this.ai=ai; this.turn=1; this.over=false; this.init(); }
+            status(m) { this.st.innerText = m; }
+            wait(cb, t=800) { setTimeout(cb, t); }
+            endTurn() {
+                this.turn = this.turn === 1 ? 2 : 1;
+                if(this.over) return;
+                const p = this.turn === 1 ? "Player 1" : (this.ai ? "AI" : "Player 2");
+                this.status(`${p}'s Turn`);
+                if(this.ai && this.turn === 2) this.wait(() => this.aiMove());
+            }
         }
 
-        /* --- YAHTZEE --- */
+        // --- YAHTZEE 3D ---
         class Yahtzee extends Game {
             init() {
                 this.dice = [1,1,1,1,1];
-                this.held = [false,false,false,false,false]; // 0-4
+                this.held = [false,false,false,false,false];
                 this.rolls = 3;
-                this.scores = {1:Array(13).fill(null), 2:Array(13).fill(null)};
-                this.cats = ["Ones","Twos","Threes","Fours","Fives","Sixes","3 of Kind","4 of Kind","Full House","Sm Str","Lg Str","Yahtzee","Chance"];
-                this.render();
+                this.scores = { 1: Array(13).fill(null), 2: Array(13).fill(null) };
+                this.cats = ["Ones", "Twos", "Threes", "Fours", "Fives", "Sixes", "3 of Kind", "4 of Kind", "Full House", "Sm Straight", "Lg Straight", "Yahtzee", "Chance"];
+                this.renderBoard();
                 this.updateUI();
             }
 
-            render() {
-                this.stage.innerHTML = `
-                    <div class="yz-table">
-                        <div class="yz-area">
-                            <div class="yz-rack" id="yz-rack">
-                                ${[0,1,2,3,4].map(i=>`<div class="yz-rack-slot" id="slot-${i}"></div>`).join('')}
-                            </div>
-                            <div class="yz-felt">
-                                <div class="yz-rolling-grid">
-                                    ${[0,1,2,3,4].map(i=>`<div class="yz-grid-cell" id="field-${i}"></div>`).join('')}
-                                </div>
-                            </div>
+            renderBoard() {
+                this.el.innerHTML = `
+                    <div class="yz-layout">
+                        <div class="yz-board">
+                            <div class="yz-tray" id="yz-tray"></div>
                             <div class="yz-controls">
-                                <button class="roll-btn" id="rollBtn" onclick="app.game.roll()">Roll (3)</button>
+                                <button class="btn" id="roll-btn" onclick="app.game.roll()">Roll (3)</button>
                             </div>
                         </div>
-                        <div class="yz-sidebar">
-                            <div class="scorecard" id="yz-card"></div>
-                        </div>
+                        <div class="yz-scorecard" id="yz-card"></div>
                     </div>
                 `;
-                // Create Dice Elements (detached initially)
-                this.diceEls = [];
-                for(let i=0; i<5; i++) {
-                    const d = document.createElement('div');
-                    d.className = 'die';
-                    d.id = `die-${i}`;
-                    d.onclick = () => this.toggle(i);
-                    // Build Faces
-                    let h = '';
-                    const pip = '<div class="pip"></div>';
-                    // F1
-                    h+=`<div class="face f1"><div class="pip c"></div></div>`;
-                    // F2
-                    h+=`<div class="face f2"><div class="pip tl"></div><div class="pip br"></div></div>`;
-                    // F3
-                    h+=`<div class="face f3"><div class="pip tl"></div><div class="pip c"></div><div class="pip br"></div></div>`;
-                    // F4
-                    h+=`<div class="face f4"><div class="pip tl"></div><div class="pip tr"></div><div class="pip bl"></div><div class="pip br"></div></div>`;
-                    // F5
-                    h+=`<div class="face f5"><div class="pip tl"></div><div class="pip tr"></div><div class="pip c"></div><div class="pip bl"></div><div class="pip br"></div></div>`;
-                    // F6
-                    h+=`<div class="face f6"><div class="pip tl"></div><div class="pip tr"></div><div class="pip ml"></div><div class="pip mr"></div><div class="pip bl"></div><div class="pip br"></div></div>`;
-                    d.innerHTML = h;
-                    this.diceEls.push(d);
-                }
-                
-                this.placeDice();
-                this.renderScore();
+                this.renderDice();
+                this.renderCard();
             }
 
-            // Places dice in Rack or Field based on 'held' state
-            placeDice() {
+            renderDice() {
+                const t = document.getElementById('yz-tray');
+                if(!t.innerHTML) {
+                    for(let i=0; i<5; i++) {
+                        const w = document.createElement('div'); w.className = 'die-wrap';
+                        w.onclick = () => this.toggle(i);
+                        const d = document.createElement('div'); d.className = 'die'; d.id = `d${i}`;
+                        const dots = n => {
+                            let h=''; 
+                            if(n===1) h='<div class="dot c"></div>';
+                            if(n===2) h='<div class="dot tl"></div><div class="dot br"></div>';
+                            if(n===3) h='<div class="dot tl"></div><div class="dot c"></div><div class="dot br"></div>';
+                            if(n===4) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            if(n===5) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot c"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            if(n===6) h='<div class="dot tl"></div><div class="dot tr"></div><div class="dot ml"></div><div class="dot mr"></div><div class="dot bl"></div><div class="dot br"></div>';
+                            return h;
+                        }
+                        for(let f=1; f<=6; f++) {
+                            const face = document.createElement('div'); face.className = `face f${f}`;
+                            face.innerHTML = dots(f);
+                            d.appendChild(face);
+                        }
+                        w.appendChild(d); t.appendChild(w);
+                    }
+                }
+                this.updateDiceTransforms();
+            }
+
+            updateDiceTransforms(random = false) {
+                const rot = {1:[0,0], 2:[-90,0], 3:[0,-90], 4:[0,90], 5:[90,0], 6:[180,0]};
                 for(let i=0; i<5; i++) {
-                    const el = this.diceEls[i];
-                    if(this.held[i]) {
-                        // Move to Rack
-                        const slot = document.getElementById(`slot-${i}`);
-                        if(slot && slot.children.length === 0) slot.appendChild(el);
-                        // Reset transform for rack (clean look)
-                        this.setDieRotation(el, this.dice[i], false);
-                    } else {
-                        // Move to Field
-                        const cell = document.getElementById(`field-${i}`);
-                        if(cell && cell.children.length === 0) cell.appendChild(el);
-                        // Random rotation for field
-                        this.setDieRotation(el, this.dice[i], true);
+                    const d = document.getElementById(`d${i}`);
+                    const w = d.parentElement;
+                    w.className = `die-wrap ${this.held[i]?'held':''}`;
+                    if(!this.held[i] || random) {
+                        const val = this.dice[i];
+                        // Add slight randomization to rotation for natural look
+                        const rx = rot[val][0] + (random ? (Math.random()*16-8) : 0);
+                        const ry = rot[val][1] + (random ? (Math.random()*16-8) : 0);
+                        d.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
                     }
                 }
             }
 
-            setDieRotation(el, val, random) {
-                const rot = {1:[0,0], 2:[-90,0], 3:[0,-90], 4:[0,90], 5:[90,0], 6:[180,0]};
-                let rx = rot[val][0];
-                let ry = rot[val][1];
-                if(random) {
-                    rx += (Math.random()*20 - 10);
-                    ry += (Math.random()*20 - 10);
-                }
-                el.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
-            }
-
-            renderScore() {
-                const sc = document.getElementById('yz-card');
-                let h = `<div class="score-header"><div class="sc-cat">Category</div><div class="sc-val">P1</div><div class="sc-val">${this.ai?'CPU':'P2'}</div></div>`;
+            renderCard() {
+                const c = document.getElementById('yz-card');
+                let h = `<div class="yz-header"><div class="yz-cell wide">Category</div><div class="yz-cell">P1</div><div class="yz-cell">${this.ai?'AI':'P2'}</div></div>`;
                 
-                const sum = a => a.reduce((x,y)=>x+(y||0),0);
-
                 this.cats.forEach((cat, i) => {
                     const s1 = this.scores[1][i];
                     const s2 = this.scores[2][i];
+                    const p1Can = this.turn===1 && s1===null && this.rolls<3;
+                    const p2Can = this.turn===2 && !this.ai && s2===null && this.rolls<3;
                     
-                    const p1Active = this.turn===1 && s1===null && this.rolls<3;
-                    const p2Active = this.turn===2 && !this.ai && s2===null && this.rolls<3;
-
-                    const click = p1Active ? `onclick="app.game.score(${i})"` : (p2Active ? `onclick="app.game.score(${i})"` : '');
-                    
-                    h += `
-                    <div class="score-row ${s1!==null&&this.turn===1?'locked':''}" ${click}>
-                        <div class="sc-cat">${cat}</div>
-                        <div class="sc-val p1-col"><div class="sc-box ${s1!==null?'fill':''}">${s1===null && p1Active ? this.calcScore(i) : (s1===null?'':s1)}</div></div>
-                        <div class="sc-val p2-col"><div class="sc-box ${s2!==null?'fill':''}">${s2===null && p2Active ? this.calcScore(i) : (s2===null?'':s2)}</div></div>
+                    h += `<div class="yz-row ${s1!==null?'locked':''}" ${p1Can?`onclick="app.game.pick(${i})"`:''}>
+                        <div class="yz-cell wide">${cat}</div>
+                        <div class="yz-cell yz-val" style="${p1Can?'color:blue':''}">${s1===null?'-':s1}</div>
+                        <div class="yz-cell yz-val" ${p2Can?`onclick="app.game.pick(${i})"`:''} style="${p2Can?'color:blue; cursor:pointer':''}">${s2===null?'-':s2}</div>
                     </div>`;
                 });
-
-                h += `<div class="score-header" style="margin-top:20px"><div class="sc-cat">TOTAL</div><div class="sc-val">${sum(this.scores[1])}</div><div class="sc-val">${sum(this.scores[2])}</div></div>`;
-                sc.innerHTML = h;
-            }
-
-            toggle(i) {
-                if(this.rolls===3 || this.over || (this.ai && this.turn===2)) return;
-                this.held[i] = !this.held[i];
-                this.placeDice(); // Move visually
-            }
-
-            roll() {
-                if(this.rolls<=0 || this.over) return;
-                this.rolls--;
                 
-                // Anim
-                this.diceEls.forEach((el, i) => {
-                    if(!this.held[i]) el.classList.add('rolling');
-                });
-
-                this.updateUI();
-
-                setTimeout(() => {
-                    this.diceEls.forEach((el, i) => {
-                        el.classList.remove('rolling');
-                        if(!this.held[i]) this.dice[i] = Math.ceil(Math.random()*6);
-                    });
-                    this.placeDice(); // Updates rotations
-                    this.renderScore();
-                    this.updateUI();
-
-                    if(this.ai && this.turn===2) {
-                        if(this.rolls>0) this.wait(()=>this.aiStrategy(), 800);
-                        else this.wait(()=>this.aiScore(), 800);
-                    }
-
-                }, 500);
+                const sum = arr => arr.reduce((a,b)=>a+(b||0),0);
+                h += `<div class="yz-row yz-total"><div class="yz-cell wide">TOTAL</div><div class="yz-cell">${sum(this.scores[1])}</div><div class="yz-cell">${sum(this.scores[2])}</div></div>`;
+                c.innerHTML = h;
             }
 
             updateUI() {
-                const btn = document.getElementById('rollBtn');
-                if(!btn) return;
-                const p = this.turn===1?"P1":(this.ai?"CPU":"P2");
+                const btn = document.getElementById('roll-btn');
+                const p = this.turn===1?"Player 1":(this.ai?"AI":"Player 2");
                 this.status(this.rolls===3 ? `${p}: Roll to Start` : (this.rolls===0 ? `${p}: Select Score` : `${p}: Rolls Left ${this.rolls}`));
                 btn.innerText = `Roll (${this.rolls})`;
-                btn.disabled = this.rolls===0 || (this.ai && this.turn===2);
+                btn.disabled = this.rolls === 0 || (this.ai && this.turn===2);
             }
 
-            calcScore(idx) {
+            toggle(i) {
+                if(this.rolls===3 || (this.ai && this.turn===2)) return;
+                this.held[i] = !this.held[i];
+                this.updateDiceTransforms();
+            }
+
+            roll() {
+                if(this.rolls<=0) return;
+                this.rolls--;
+                for(let i=0; i<5; i++) {
+                    if(!this.held[i]) {
+                        document.getElementById(`d${i}`).classList.add('rolling');
+                        this.dice[i] = Math.ceil(Math.random()*6);
+                    }
+                }
+                this.updateUI();
+                
+                setTimeout(() => {
+                    for(let i=0; i<5; i++) document.getElementById(`d${i}`).classList.remove('rolling');
+                    this.updateDiceTransforms(true);
+                    this.renderCard();
+                    
+                    if(this.ai && this.turn===2) {
+                         if(this.rolls>0) this.wait(()=>this.aiStrategy(), 1000);
+                         else this.wait(()=>this.aiPick(), 1000);
+                    }
+                }, 500);
+            }
+
+            pick(idx) {
                 const d = this.dice;
+                let s = 0;
                 const counts = [0,0,0,0,0,0,0]; d.forEach(x=>counts[x]++);
                 const sum = d.reduce((a,b)=>a+b,0);
-                if(idx<6) return counts[idx+1]*(idx+1); // Upper
-                if(idx===6) return counts.some(x=>x>=3) ? sum : 0; // 3ok
-                if(idx===7) return counts.some(x=>x>=4) ? sum : 0; // 4ok
-                if(idx===8) return (counts.includes(3)&&counts.includes(2))||counts.includes(5) ? 25 : 0; // FH
-                if(idx===9) return this.seq(counts)>=4 ? 30 : 0; // Sm
-                if(idx===10) return this.seq(counts)>=5 ? 40 : 0; // Lg
-                if(idx===11) return counts.includes(5) ? 50 : 0; // YZ
-                return sum; // Chance
-            }
-            seq(c){ let m=0,cu=0; for(let i=1;i<=6;i++){if(c[i])cu++;else cu=0; m=Math.max(m,cu);} return m; }
 
-            score(idx) {
-                const val = this.calcScore(idx);
-                this.scores[this.turn][idx] = val;
-                
-                // Check End
-                if(!this.scores[1].includes(null) && !this.scores[2].includes(null)) {
-                    this.over = true;
-                    this.renderScore();
-                    const t1 = this.scores[1].reduce((a,b)=>a+b,0);
-                    const t2 = this.scores[2].reduce((a,b)=>a+b,0);
-                    this.status(t1>t2?"P1 Wins!": (t2>t1 ? (this.ai?"CPU Wins!":"P2 Wins!") : "Draw!"));
-                    return;
-                }
+                if(idx<6) s = counts[idx+1]*(idx+1);
+                else if(idx===6) { if(counts.some(x=>x>=3)) s=sum; }
+                else if(idx===7) { if(counts.some(x=>x>=4)) s=sum; }
+                else if(idx===8) { if((counts.includes(3)&&counts.includes(2))||counts.includes(5)) s=25; }
+                else if(idx===9) { if(this.straight(counts)>=4) s=30; }
+                else if(idx===10) { if(this.straight(counts)>=5) s=40; }
+                else if(idx===11) { if(counts.includes(5)) s=50; }
+                else if(idx===12) s=sum;
 
-                // Reset Round
+                this.scores[this.turn][idx] = s;
                 this.held.fill(false);
                 this.dice.fill(1);
                 this.rolls = 3;
-                this.placeDice();
-                this.renderScore();
-                this.endTurn();
-                this.updateUI();
-                if(this.ai && this.turn===2) this.wait(()=>this.roll(), 1000);
-            }
+                this.updateDiceTransforms();
+                this.renderCard();
 
-            // AI
-            aiStrategy() {
-                // Keep matching
-                const cts=[0,0,0,0,0,0,0]; this.dice.forEach(x=>cts[x]++);
-                const max = Math.max(...cts);
-                const target = cts.lastIndexOf(max);
-                this.dice.forEach((d,i)=>{
-                    if(d===target && max>=2) this.held[i]=true;
-                    else this.held[i]=false;
-                });
-                this.placeDice();
-                this.wait(()=>this.roll(), 500);
-            }
-            aiScore() {
-                // Pick best
-                let bestI=-1, bestS=-1;
-                this.scores[2].forEach((v, i) => {
-                    if(v===null) {
-                        const s = this.calcScore(i);
-                        if(s>bestS) { bestS=s; bestI=i; }
-                    }
-                });
-                this.score(bestI);
-            }
-        }
-
-        /* --- OTHER GAMES (Visual Fixes) --- */
-        class TicTacToe extends Game {
-            init(){this.b=Array(9).fill(null);this.render();}
-            render(){
-                this.stage.innerHTML=`<div class="t-board">${[0,1,2,3,4,5,6,7,8].map(i=>`<div class="t-cell" onclick="app.game.mv(${i})"></div>`).join('')}</div>`;
-                this.status("P1 Turn");
-            }
-            mv(i){
-                if(this.b[i]||this.over)return;
-                const p=this.turn===1?'X':'O'; this.b[i]=p;
-                this.stage.querySelectorAll('.t-cell')[i].innerText=p;
-                this.stage.querySelectorAll('.t-cell')[i].style.color = p==='X'?'#ef5350':'#42a5f5';
-                if(this.chk(p)){this.over=true;this.status(p+" Wins!");return;}
-                if(!this.b.includes(null)){this.over=true;this.status("Draw!");return;}
-                this.endTurn();
-            }
-            chk(p){return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(c=>this.b[c[0]]==p&&this.b[c[1]]==p&&this.b[c[2]]==p);}
-            aiMove(){let m,b=-Infinity;this.b.forEach((v,i)=>{if(!v){this.b[i]='O';let s=this.mm(this.b,0,false);this.b[i]=null;if(s>b){b=s;m=i;}}});this.mv(m);}
-            mm(bd,d,mx){if(this.chk('O'))return 10-d;if(this.chk('X'))return d-10;if(!bd.includes(null))return 0;
-            if(mx){let b=-Infinity;bd.forEach((v,i)=>{if(!v){bd[i]='O';b=Math.max(b,this.mm(bd,d+1,false));bd[i]=null;}});return b;}
-            else{let b=Infinity;bd.forEach((v,i)=>{if(!v){bd[i]='X';b=Math.min(b,this.mm(bd,d+1,true));bd[i]=null;}});return b;}}
-        }
-
-        class Checkers extends Game {
-            init(){this.b=Array(8).fill().map((_,r)=>Array(8).fill(null).map((_,c)=>(r+c)%2&&r<3?{p:2,k:0}:(r+c)%2&&r>4?{p:1,k:0}:null));this.sel=null;this.mvs=[];this.render();}
-            render(){this.stage.innerHTML=`<div class="chk-board"></div>`;this.dr();}
-            dr(){
-                const el=this.stage.querySelector('.chk-board'); el.innerHTML='';
-                for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-                    const d=document.createElement('div');d.className=`chk-c ${(r+c)%2?'b':'w'}`;
-                    d.onclick=()=>this.clk(r,c);
-                    if(this.mvs.some(m=>m.r===r&&m.c===c)) d.style.background='#76ff03';
-                    const p=this.b[r][c];
-                    if(p){const pc=document.createElement('div');pc.className=`chk-p ${p.p===1?'r':'blk'} ${p.k?'king':''}`;
-                    if(this.sel?.r===r&&this.sel.c===c)pc.style.boxShadow='0 0 0 3px gold';d.appendChild(pc);}
-                    el.appendChild(d);
+                if(!this.scores[1].includes(null) && !this.scores[2].includes(null)) {
+                    this.over = true;
+                    const t1=this.scores[1].reduce((a,b)=>a+b,0), t2=this.scores[2].reduce((a,b)=>a+b,0);
+                    this.status(`Game Over! P1: ${t1} - ${this.ai?'AI':'P2'}: ${t2}`);
+                } else {
+                    this.endTurn();
+                    this.updateUI();
+                    if(this.ai && this.turn===2) this.wait(()=>this.roll(), 1000);
                 }
             }
-            clk(r,c){
-                if(this.over||(this.ai&&this.turn===2))return;
-                const p=this.b[r][c]; if(p&&p.p===this.turn){this.sel={r,c};this.mvs=this.gm(r,c);this.dr();}
-                else if(this.sel){const m=this.mvs.find(x=>x.r===r&&x.c===c);if(m)this.mv(m);else{this.sel=null;this.mvs=[];this.dr();}}
-            }
-            gm(r,c){const p=this.b[r][c],m=[];if(!p)return[];
-            const d=p.k?[[-1,-1],[-1,1],[1,-1],[1,1]]:(p.p===1?[[-1,-1],[-1,1]]:[[1,-1],[1,1]]);
-            d.forEach(([dr,dc])=>{if(!this.b[r+dr]?.[c+dc]&&this.ib(r+dr,c+dc))m.push({r:r+dr,c:c+dc});
-            if(this.b[r+dr]?.[c+dc]&&this.b[r+dr][c+dc].p!==p.p&&!this.b[r+dr*2]?.[c+dc*2]&&this.ib(r+dr*2,c+dc*2))m.push({r:r+dr*2,c:c+dc*2,k:{r:r+dr,c:c+dc}});});return m;}
-            ib(r,c){return r>=0&&r<8&&c>=0&&c<8;}
-            mv(m){const p=this.b[this.sel.r][this.sel.c];this.b[m.r][m.c]=p;this.b[this.sel.r][this.sel.c]=null;if(m.k)this.b[m.k.r][m.k.c]=null;
-            if((p.p===1&&m.r===0)||(p.p===2&&m.r===7))p.k=1;this.sel=null;this.mvs=[];this.dr();this.endTurn();}
-            aiMove(){let all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.b[r][c]?.p===2)this.gm(r,c).forEach(m=>all.push({f:{r,c},t:m}));
-            if(!all.length){this.over=true;this.status("Red Wins");return;}
-            const j=all.filter(x=>x.t.k),m=j.length?j[0]:all[Math.floor(Math.random()*all.length)];
-            this.sel=m.f;this.mv(m.t);}
-        }
-        class Connect4 extends Game{init(){this.b=Array(6).fill().map(()=>Array(7).fill(null));this.render();this.status("Red's Turn");}render(){this.stage.innerHTML=`<div class="c4-board">${Array(42).fill(0).map((_,i)=>`<div class="c4-c" onclick="app.game.mv(${i%7})"></div>`).join('')}</div>`;}mv(c){if(this.over||(this.ai&&this.turn===2))return;let r=-1;for(let i=5;i>=0;i--)if(!this.b[i][c]){r=i;break;}if(r<0)return;const p=this.turn===1?'r':'y';this.b[r][c]=p;const cell=this.stage.querySelectorAll('.c4-c')[r*7+c];cell.innerHTML=`<div class="c4-p ${p}"></div>`;if(this.chk(r,c,p)){this.over=true;this.status(p.toUpperCase()+" Wins");}else this.endTurn();}chk(r,c,p){const d=[[0,1],[1,0],[1,1],[1,-1]];return d.some(([dr,dc])=>{let k=1;for(let i=1;i<4;i++)if(this.b[r+dr*i]?.[c+dc*i]===p)k++;else break;for(let i=1;i<4;i++)if(this.b[r-dr*i]?.[c-dc*i]===p)k++;else break;return k>=4;});}aiMove(){let c;do{c=Math.floor(Math.random()*7)}while(this.b[0][c]);this.mv(c);}}
 
-        // --- ENGINE ---
-        const engine = {
-            list: [
-                {id:'yz',n:'Yahtzee',i:'🎲',c:Yahtzee},
-                {id:'c4',n:'Connect 4',i:'🔴',c:Connect4},
-                {id:'chk',n:'Checkers',i:'🏁',c:Checkers},
-                {id:'ttt',n:'TicTacToe',i:'❌',c:TicTacToe}
-            ],
-            sel: null, game: null,
+            straight(c) { let m=0, cur=0; for(let i=1;i<=6;i++){if(c[i])cur++;else cur=0; if(cur>m)m=cur;} return m; }
+
+            aiStrategy() {
+                const c=[0,0,0,0,0,0,0]; this.dice.forEach(x=>c[x]++);
+                const max = Math.max(...c);
+                const target = c.lastIndexOf(max); 
+                this.dice.forEach((d,i) => {
+                     if(d===target && max>=2) this.held[i]=true;
+                     else this.held[i]=false;
+                });
+                this.updateDiceTransforms();
+                this.roll();
+            }
+
+            aiPick() {
+                const open = this.scores[2].map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
+                let bestI=open[0], bestS=-1;
+                open.forEach(i => {
+                    let s=0; const d=this.dice; const cts=[0,0,0,0,0,0,0]; d.forEach(x=>cts[x]++); const sm=d.reduce((a,b)=>a+b,0);
+                    if(i<6) s = cts[i+1]*(i+1);
+                    else if(i===6 && cts.some(x=>x>=3)) s=sm;
+                    else if(i===7 && cts.some(x=>x>=4)) s=sm;
+                    else if(i===8 && ((cts.includes(3)&&cts.includes(2))||cts.includes(5))) s=25;
+                    else if(i===9 && this.straight(cts)>=4) s=30;
+                    else if(i===10 && this.straight(cts)>=5) s=40;
+                    else if(i===11 && cts.includes(5)) s=50;
+                    else if(i===12) s=sm;
+                    if(s>bestS) { bestS=s; bestI=i; }
+                });
+                this.pick(bestI);
+            }
+        }
+
+        // --- TIC TAC TOE ---
+        class TicTacToe extends Game {
+            init() { this.board=Array(9).fill(null); this.render(); this.status(this.turn===1?"Player 1 (X)":"Player 2 (O)"); }
+            render() {
+                this.el.innerHTML = '<div class="ttt-board"></div>'; const b=this.el.querySelector('.ttt-board');
+                for(let i=0;i<9;i++){ const c=document.createElement('div'); c.className='ttt-cell'; c.onclick=()=>this.move(i); b.appendChild(c); }
+            }
+            move(i) {
+                if(this.board[i]||this.over||(this.ai&&this.turn===2)) return;
+                this.mark(i, this.turn===1?'X':'O');
+            }
+            mark(i, p) {
+                this.board[i]=p;
+                this.el.querySelectorAll('.ttt-cell')[i].innerHTML = `<div class="ttt-piece ${p.toLowerCase()}">${p}</div>`;
+                if(this.check(p)){ this.over=true; this.status(p+" Wins!"); return; }
+                if(!this.board.includes(null)){ this.over=true; this.status("Draw!"); return; }
+                this.endTurn();
+            }
+            check(p) { return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(c=>this.board[c[0]]===p&&this.board[c[1]]===p&&this.board[c[2]]===p); }
+            aiMove() {
+                let m, best=-Infinity;
+                for(let i=0;i<9;i++) if(!this.board[i]) {
+                    this.board[i]='O'; let s=this.minimax(this.board,0,false); this.board[i]=null;
+                    if(s>best){best=s;m=i;}
+                }
+                this.mark(m, 'O');
+            }
+            minimax(b,d,max) {
+                if(this.check('O')) return 10-d; if(this.check('X')) return d-10; if(!b.includes(null)) return 0;
+                if(max) { let v=-Infinity; for(let i=0;i<9;i++)if(!b[i]){b[i]='O';v=Math.max(v,this.minimax(b,d+1,false));b[i]=null;} return v; }
+                else { let v=Infinity; for(let i=0;i<9;i++)if(!b[i]){b[i]='X';v=Math.min(v,this.minimax(b,d+1,true));b[i]=null;} return v; }
+            }
+        }
+
+        // --- CHECKERS ---
+        class Checkers extends Game {
             init() {
-                const g = document.getElementById('game-list');
-                this.list.forEach(x => {
-                    const d = document.createElement('div');
-                    d.className = 'card';
-                    d.innerHTML = `<div class="card-icon">${x.i}</div><div class="card-title">${x.n}</div>`;
-                    d.onclick = () => this.prompt(x);
-                    g.appendChild(d);
+                this.board = Array(8).fill().map(()=>Array(8).fill(null));
+                for(let r=0;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2){if(r<3)this.board[r][c]={p:2,k:0};if(r>4)this.board[r][c]={p:1,k:0};}
+                this.sel=null; this.moves=[]; this.render(); this.status("Red's Turn");
+            }
+            render() {
+                this.el.innerHTML = '<div class="chk-board"></div>'; const b=this.el.querySelector('.chk-board');
+                this.grid=[]; for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){
+                    const d=document.createElement('div'); d.className=`chk-cell ${(r+c)%2?'b':'w'}`; d.onclick=()=>this.clk(r,c);
+                    b.appendChild(d); row.push(d);
+                } this.grid.push(row); }
+                this.draw();
+            }
+            draw() {
+                this.grid.forEach(r=>r.forEach(c=>{c.innerHTML='';c.classList.remove('highlight')}));
+                for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+                    const p=this.board[r][c];
+                    if(p){
+                        const d=document.createElement('div'); d.className=`chk-piece p${p.p} ${p.k?'king':''}`;
+                        if(this.sel?.r===r && this.sel?.c===c) d.style.boxShadow='0 0 0 3px gold';
+                        this.grid[r][c].appendChild(d);
+                    }
+                }
+                this.moves.forEach(m=>this.grid[m.r][m.c].classList.add('highlight'));
+            }
+            clk(r,c) {
+                if(this.over || (this.ai && this.turn===2)) return;
+                const p = this.board[r][c];
+                if(p && p.p===this.turn) { this.sel={r,c}; this.moves=this.getMoves(r,c,this.board); this.draw(); }
+                else if(this.sel) {
+                    const m = this.moves.find(mv=>mv.r===r && mv.c===c);
+                    if(m) this.exec(m); else { this.sel=null; this.moves=[]; this.draw(); }
+                }
+            }
+            getMoves(r,c,b) {
+                const p=b[r][c], m=[]; if(!p)return[];
+                const dirs=p.k?[[-1,-1],[-1,1],[1,-1],[1,1]]:(p.p===1?[[-1,-1],[-1,1]]:[[1,-1],[1,1]]);
+                dirs.forEach(([dr,dc])=>{
+                    if(b[r+dr]?.[c+dc]===null) m.push({r:r+dr,c:c+dc});
+                    if(b[r+dr]?.[c+dc] && b[r+dr][c+dc].p!==p.p && b[r+dr*2]?.[c+dc*2]===null) m.push({r:r+dr*2,c:c+dc*2,k:{r:r+dr,c:c+dc}});
+                }); return m;
+            }
+            exec(t) {
+                const p = this.board[this.sel.r][this.sel.c];
+                this.board[t.r][t.c] = p; this.board[this.sel.r][this.sel.c] = null;
+                if((p.p===1&&t.r===0)||(p.p===2&&t.r===7)) p.k=1;
+                if(t.k) this.board[t.k.r][t.k.c]=null;
+                this.sel=null; this.moves=[]; this.draw();
+                let r=0, b=0; this.board.forEach(row=>row.forEach(x=>{if(x){x.p===1?r++:b++}}));
+                if(!r||!b) { this.over=true; this.status(b?"Black Wins":"Red Wins"); } else this.endTurn();
+            }
+            aiMove() {
+                let all=[]; for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.board[r][c]?.p===2) this.getMoves(r,c,this.board).forEach(m=>all.push({f:{r,c},t:m}));
+                if(!all.length){this.over=true;this.status("Red Wins");return;}
+                const jumps=all.filter(x=>x.t.k); const mv=jumps.length?jumps[Math.floor(Math.random()*jumps.length)]:all[Math.floor(Math.random()*all.length)];
+                this.sel=mv.f; this.exec(mv.t);
+            }
+        }
+
+        // --- CONNECT 4 & CHESS ---
+        class Connect4 extends Game{init(){this.b=Array(6).fill().map(()=>Array(7).fill(null));this.render();this.status("Red's Turn");}render(){this.el.innerHTML=`<div class="c4-frame"><div class="c4-grid" id="c4g"></div></div>`;const g=document.getElementById('c4g');for(let r=0;r<6;r++)for(let c=0;c<7;c++){const d=document.createElement('div');d.className='c4-cell';d.onclick=()=>this.mv(c);const m=document.createElement('div');m.className='c4-mask';d.appendChild(m);g.appendChild(d);}}mv(c){if(this.over||(this.ai&&this.turn===2))return;let r=-1;for(let i=5;i>=0;i--)if(!this.b[i][c]){r=i;break;}if(r<0)return;const p=this.turn===1?'red':'yel';this.b[r][c]=p;const pc=document.createElement('div');pc.className=`c4-piece ${p}`;this.el.querySelectorAll('.c4-cell')[r*7+c].appendChild(pc);if(this.chk(r,c,p)){this.over=true;this.status(`${p.toUpperCase()} Wins!`);}else this.endTurn();}chk(r,c,p){const d=[[0,1],[1,0],[1,1],[1,-1]];return d.some(([dr,dc])=>{let k=1;for(let i=1;i<4;i++)if(this.b[r+dr*i]?.[c+dc*i]===p)k++;else break;for(let i=1;i<4;i++)if(this.b[r-dr*i]?.[c-dc*i]===p)k++;else break;return k>=4;});}aiMove(){let c=Math.floor(Math.random()*7);for(let i=0;i<20;i++){let r=-1;for(let j=5;j>=0;j--)if(!this.b[j][c]){r=j;break;}if(r>=0)break;c=Math.floor(Math.random()*7);}this.mv(c);}}
+        class Chess extends Game{init(){const s=[['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),Array(8).fill(null),['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']];this.b=s.map(r=>[...r]);this.sel=null;this.mvs=[];this.render();this.status("White's Turn");}render(){this.el.innerHTML='<div class="chess-board"></div>';const el=this.el.querySelector('.chess-board');this.g=[];for(let r=0;r<8;r++){let row=[];for(let c=0;c<8;c++){const d=document.createElement('div');d.className=`chess-cell ${(r+c)%2?'d':'l'}`;d.onclick=()=>this.clk(r,c);el.appendChild(d);row.push(d);}this.g.push(row);}this.draw();}draw(){const ic={P:'♟',R:'♜',N:'♞',B:'♝',Q:'♛',K:'♚',p:'♟',r:'♜',n:'♞',b:'♝',q:'♛',k:'♚'};for(let r=0;r<8;r++)for(let c=0;c<8;c++){const d=this.g[r][c];d.innerHTML='';d.className=`chess-cell ${(r+c)%2?'d':'l'}`;if(this.b[r][c]){const p=document.createElement('div');p.className=`chess-piece ${this.b[r][c]<='Z'?'w':'b'}`;p.innerText=ic[this.b[r][c]];d.appendChild(p);}}if(this.sel)this.g[this.sel.r][this.sel.c].classList.add('sel');this.mvs.forEach(m=>this.g[m.r][m.c].classList.add('mv'));}clk(r,c){if(this.over||(this.ai&&this.turn===2))return;const mv=this.mvs.find(m=>m.r===r&&m.c===c);if(mv){this.mv(mv);return;}const p=this.b[r][c];if(p&&((this.turn===1&&p<='Z')||(this.turn===2&&p>='a'))){this.sel={r,c};this.mvs=this.getMvs(r,c);this.draw();}else{this.sel=null;this.mvs=[];this.draw();}}mv(m){const p=this.b[m.fr][m.fc];if(this.b[m.r][m.c]?.toLowerCase()==='k'){this.over=true;this.status("Win!");}this.b[m.r][m.c]=p;this.b[m.fr][m.fc]=null;this.sel=null;this.mvs=[];this.draw();this.endTurn();}getMvs(r,c){const p=this.b[r][c],w=p<='Z',m=[],add=(tr,tc)=>{if(tr<0||tr>7||tc<0||tc>7)return 0;const t=this.b[tr][tc];if(!t){m.push({r:tr,c:tc,fr:r,fc:c});return 1;}if((w&&t>='a')||(!w&&t<='Z')){m.push({r:tr,c:tc,fr:r,fc:c});return 0;}return 0;};const ty=p.toLowerCase();if(ty==='p'){const d=w?-1:1;if(!this.b[r+d][c]){m.push({r:r+d,c:c,fr:r,fc:c});if((w&&r===6)||(!w&&r===1))if(!this.b[r+d*2][c])m.push({r:r+d*2,c:c,fr:r,fc:c});}if(this.b[r+d]?.[c-1]&&((w&&this.b[r+d][c-1]>='a')||(!w&&this.b[r+d][c-1]<='Z')))m.push({r:r+d,c:c-1,fr:r,fc:c});if(this.b[r+d]?.[c+1]&&((w&&this.b[r+d][c+1]>='a')||(!w&&this.b[r+d][c+1]<='Z')))m.push({r:r+d,c:c+1,fr:r,fc:c});}if(ty==='r'||ty==='q')[[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='b'||ty==='q')[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{for(let i=1;i<8;i++)if(!add(r+dr*i,c+dc*i))break;});if(ty==='n')[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]].forEach(([dr,dc])=>add(r+dr,c+dc));if(ty==='k')[[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));return m;}aiMove(){let all=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(this.b[r][c]>='a')this.sel={r,c},this.getMvs(r,c).forEach(m=>all.push(m));if(!all.length){this.over=true;this.status("Stalemate");return;}const m=all[Math.floor(Math.random()*all.length)];this.mv(m);}}
+
+        const app = {
+            game: null, pending: null,
+            list: [
+                {id:'yz', n:'Yahtzee', i:'🎲', c:Yahtzee, a:true},
+                {id:'c4', n:'Connect 4', i:'🔴', c:Connect4, a:true},
+                {id:'ch', n:'Chess', i:'♟️', c:Chess, a:true},
+                {id:'ttt', n:'Tic Tac Toe', i:'❌', c:TicTacToe, a:true},
+                {id:'chk', n:'Checkers', i:'🏁', c:Checkers, a:true}
+            ],
+            init() {
+                const g = document.getElementById('game-grid');
+                this.list.forEach(i => {
+                    const el = document.createElement('div');
+                    el.className = `game-card ${i.a?'':'disabled'}`;
+                    el.innerHTML = `<div class="game-icon">${i.i}</div><div class="game-title">${i.n}</div><div class="game-status">${i.a?'Ready':'Soon'}</div>`;
+                    el.onclick = () => { if(i.a) this.prompt(i); }
+                    g.appendChild(el);
                 });
             },
-            prompt(x) { this.sel=x; document.getElementById('mode-modal').classList.add('active'); },
-            start(ai) {
+            prompt(i) { this.pending=i; document.getElementById('mode-modal').classList.add('active'); },
+            confirmMode(ai) {
                 document.getElementById('mode-modal').classList.remove('active');
-                document.getElementById('hub').style.transform='scale(0.9)';
-                document.getElementById('hub').style.opacity='0';
-                setTimeout(()=>{
-                    document.getElementById('app-container').classList.add('active');
-                    document.getElementById('nav-title').innerText = this.sel.n;
-                    this.game = new this.sel.c(document.getElementById('stage'), ai);
-                },500);
+                document.getElementById('game-hub').style.transform = 'scale(0.9)';
+                document.getElementById('game-hub').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('game-hub').style.display = 'none';
+                    document.getElementById('active-game-container').classList.add('visible');
+                    document.getElementById('game-title').innerText = this.pending.n;
+                    this.game = new this.pending.c(document.getElementById('board'), document.getElementById('status'), ai);
+                }, 500);
             },
-            exit() {
-                document.getElementById('app-container').classList.remove('active');
-                setTimeout(()=>{
-                    document.getElementById('hub').style.transform='scale(1)';
-                    document.getElementById('hub').style.opacity='1';
-                    document.getElementById('stage').innerHTML='';
-                    this.game=null;
-                },500);
+            toHub() {
+                document.getElementById('active-game-container').classList.remove('visible');
+                setTimeout(() => {
+                    document.getElementById('game-hub').style.display = 'flex';
+                    // force reflow
+                    void document.getElementById('game-hub').offsetWidth;
+                    document.getElementById('game-hub').style.transform = 'scale(1)';
+                    document.getElementById('game-hub').style.opacity = '1';
+                    document.getElementById('board').innerHTML = '';
+                    this.game = null;
+                }, 500);
             },
             reset() { if(this.game) this.game.init(); }
         };
-        const app = engine; // Alias
-        engine.init();
-
+        app.init();
     </script>
 </body>
 </html>
