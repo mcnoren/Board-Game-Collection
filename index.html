@@ -2,136 +2,213 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clubhouse Tabletop Collection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clubhouse Tabletop Collection Deluxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE VISUALS & RESET --- */
+        /* --- CORE VARIABLES & RESET --- */
         :root {
-            --bg-wood: #3e2723;
-            --bg-felt: #2e7d32;
-            --card-bg: #fff;
-            --text-primary: #1a1a1a;
-            --accent: #ffb74d;
-            --shadow: 0 10px 20px rgba(0,0,0,0.4);
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --wood-dark: #3E2723;
+            --wood-light: #5D4037;
+            --wood-grain: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(90)" opacity="0.2" version="1.1" xmlns="http://www.w3.org/2000/svg"><g><path fill="%23000000" d="M0 0h100v100H0z"/><path fill="%23ffffff" d="M0 0h100v3H0zM0 6h100v2H0zM0 12h100v4H0zM0 20h100v1H0zM0 26h100v3H0zM0 34h100v2H0zM0 40h100v4H0zM0 49h100v1H0zM0 54h100v3H0zM0 62h100v2H0zM0 68h100v4H0zM0 77h100v1H0zM0 82h100v3H0zM0 90h100v2H0zM0 96h100v4H0z"/></g></svg>');
+            --felt-green: #0a4a0e;
+            --felt-texture: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwBAMAAAClD0ufAAAAElBMVEUAAADkbjDlbzHkcC/lbjHlbzI66UGEAAAABnRSTlMABR4wP095k1r4AAAASElEQVQ4y2NgIB64MTAw8QMr4QASzOlcwMrwH0gYqXEDK4s6kLIwH4i4gZXZuYGVeR8Q8QMrQz9Q2R0s4gZWRn0gYWRh3AAhAADv7A19k990agAAAABJRU5ErkJggg==');
+            --accent-gold: #d4af37;
+            --accent-brass: #b5a642;
+            --plastic-blue: #0277bd;
+            --plastic-red: #c62828;
+            --plastic-yellow: #fdd835;
+            --font-ui: 'Rubik', sans-serif;
+            --font-fancy: 'Cinzel Decorative', cursive;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: var(--font-main);
-            background-color: var(--bg-wood);
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20h20v20H20V20zM0 0h20v20H0V0z' fill='%234e342e' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            font-family: var(--font-ui);
+            /* Rich wooden table background */
+            background-color: var(--wood-dark);
+            background-image: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.6) 100%), var(--wood-grain);
+            background-size: cover, 200px 200px;
             height: 100vh;
             overflow: hidden;
-            color: white;
+            color: #fffae0;
             display: flex;
             justify-content: center;
             align-items: center;
+            perspective: 1000px;
         }
 
-        /* --- THE HUB (MENU) --- */
+        /* --- THE HUB (WOODEN SHELF) --- */
         #game-hub {
-            width: 90%;
-            height: 90%;
-            background: rgba(0,0,0,0.2);
-            border-radius: 20px;
-            padding: 40px;
+            width: 95%;
+            max-width: 1000px;
+            height: 85vh;
+            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+            border-radius: 15px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(5px);
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s;
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.8),
+                0 20px 40px rgba(0,0,0,0.5),
+                0 0 0 10px var(--wood-dark);
+            border-bottom: 15px solid #2d1b18; /* Shelf thickness */
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s;
+            position: relative;
+            z-index: 10;
         }
 
         .hub-header {
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-family: var(--font-fancy);
+            font-size: 3rem;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6), 0 0 20px rgba(212, 175, 55, 0.4);
             letter-spacing: 2px;
-            text-transform: uppercase;
+            font-weight: 700;
         }
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-gap: 25px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 20px;
+            /* Shelf "back" appearance */
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
         }
+        .game-grid::-webkit-scrollbar { width: 8px; background: rgba(0,0,0,0.3); border-radius: 4px;}
+        .game-grid::-webkit-scrollbar-thumb { background: var(--accent-brass); border-radius: 4px; border: 2px solid rgba(0,0,0,0.3); }
 
-        /* Scrollbar styling */
-        .game-grid::-webkit-scrollbar { width: 8px; }
-        .game-grid::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-
+        /* 3D Game Tiles */
         .game-card {
-            background: var(--card-bg);
-            color: var(--text-primary);
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            color: var(--wood-dark);
             border-radius: 12px;
-            height: 180px;
+            height: 160px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
-            overflow: hidden;
+            /* 3D Box look */
+            box-shadow: 0 5px 0 #9e9e9e, 0 15px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-out;
+            transform-style: preserve-3d;
+            border: 2px solid #fff;
         }
 
         .game-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.4);
-            z-index: 10;
+            transform: translateY(-8px);
+            box-shadow: 0 13px 0 #9e9e9e, 0 25px 30px rgba(0,0,0,0.4);
+        }
+        
+        .game-card:active {
+             transform: translateY(2px);
+             box-shadow: 0 3px 0 #9e9e9e, 0 10px 15px rgba(0,0,0,0.4);
         }
 
         .game-card.disabled {
-            filter: grayscale(100%);
-            opacity: 0.6;
+            filter: grayscale(90%) contrast(80%);
+            opacity: 0.7;
             cursor: not-allowed;
+            box-shadow: none;
+            background: #ccc;
+            transform: none !important;
         }
 
-        .game-icon { font-size: 3rem; margin-bottom: 10px; }
-        .game-title { font-weight: bold; font-size: 1.1rem; }
-        .game-status { font-size: 0.8rem; color: #666; margin-top: 5px; }
+        .game-icon-wrapper {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            /* Adding a subtle glow around the icon */
+            filter: drop-shadow(0 4px 2px rgba(0,0,0,0.2));
+        }
+        
+        .game-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-align: center;
+            color: #333;
+        }
+        .game-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-brass);
+            background: var(--wood-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
 
-        /* --- ACTIVE GAME CONTAINER --- */
+        /* --- ACTIVE GAME CONTAINER (FELT TABLE) --- */
         #active-game-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-felt);
-            transform: translateY(100%); /* Hidden by default */
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background-color: var(--felt-green);
+            background-image: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 90%), var(--felt-texture);
+            transform: translateY(120%) rotateX(20deg); /* Start offscreen with rotation */
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            z-index: 20;
         }
 
-        #active-game-container.visible { transform: translateY(0); }
+        #active-game-container.visible {
+            transform: translateY(0) rotateX(0deg);
+            opacity: 1;
+        }
 
+        /* Brass Navbar */
         .game-navbar {
             padding: 15px 30px;
-            background: rgba(0,0,0,0.3);
+            /* Brass plaque look */
+            background: linear-gradient(to bottom, var(--accent-brass), #8c7f32);
+            border-bottom: 4px solid #6b6026;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: var(--wood-dark);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            background: var(--accent);
-            color: #3e2723;
-            font-weight: bold;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        #current-game-title {
+            font-family: var(--font-fancy);
+            font-weight: 700;
+            font-size: 1.5rem;
         }
-        .btn:hover { background: #ffcc80; }
-        .btn-secondary { background: rgba(255,255,255,0.2); color: white; }
+
+        /* Tactile Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            /* Wooden button look */
+            background: linear-gradient(to bottom, var(--wood-light), var(--wood-dark));
+            color: var(--accent-gold);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2d1b18, 0 8px 10px rgba(0,0,0,0.3);
+            transition: all 0.1s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid var(--wood-light);
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 5px 0 #2d1b18, 0 10px 15px rgba(0,0,0,0.3);}
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #2d1b18, inset 0 2px 5px rgba(0,0,0,0.5);
+        }
         
+        /* Game Area */
         .game-area {
             flex: 1;
             display: flex;
@@ -139,63 +216,153 @@
             align-items: center;
             flex-direction: column;
             position: relative;
+            padding: 20px;
         }
 
         .status-display {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.4);
-            padding: 10px 30px;
-            border-radius: 30px;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            /* Scoreboard style */
+            background: rgba(0,0,0,0.6);
+            color: var(--accent-gold);
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: 3px solid var(--accent-brass);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset 0 5px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,1);
+            text-align: center;
+            min-width: 300px;
         }
 
-        /* --- SPECIFIC GAME STYLES --- */
+        /* --- GAME SPECIFIC: CONNECT FOUR (PLASTIC STYLE) --- */
+        .c4-board-frame {
+            /* Blue plastic frame */
+            background: linear-gradient(to right, #01579b, var(--plastic-blue), #01579b);
+            padding: 20px;
+            border-radius: 15px;
+            /* 3D depth for the unit */
+            box-shadow: 
+                0 15px 0 #004c8c, /* Bottom thickness */
+                0 30px 40px rgba(0,0,0,0.5), /* Shadow on felt */
+                inset 0 -5px 15px rgba(0,0,0,0.3); /* Inner depth */
+            border: 2px solid #0288d1;
+            position: relative;
+        }
+        /* The "legs" of the connect 4 board */
+        .c4-board-frame::after {
+            content: ''; position: absolute; bottom: -25px; left: 5%; width: 90%; height: 25px;
+            background: linear-gradient(to bottom, #004c8c, var(--wood-dark));
+            z-index: -1;
+            border-radius: 0 0 10px 10px;
+        }
 
-        /* Connect 4 */
-        .c4-board {
-            background-color: #0055ff;
-            padding: 15px;
-            border-radius: 10px;
+        .c4-grid {
             display: grid;
             grid-template-columns: repeat(7, 60px);
             grid-gap: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            /* Making the board look hollow */
+            background-color: rgba(0,0,0,0.3); 
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);
         }
-        .c4-cell {
+        
+        /* The hole in the board */
+        .c4-cell-mask {
             width: 60px; height: 60px;
-            background-color: var(--bg-felt); /* See-through effect */
+            /* Cutout look */
+            background: transparent;
             border-radius: 50%;
             cursor: pointer;
             position: relative;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);
+            overflow: hidden; /* Ensures pieces look like they are inside */
+            /* Inner shadow to denote a hole */
+            box-shadow: 
+                inset 3px 3px 8px rgba(0,0,0,0.6),
+                inset -2px -2px 5px rgba(255,255,255,0.2);
+            border: 4px solid var(--plastic-blue);
         }
-        .c4-cell.red { background-color: #e53935; box-shadow: inset -2px -2px 10px rgba(0,0,0,0.3); }
-        .c4-cell.yellow { background-color: #fdd835; box-shadow: inset -2px -2px 10px rgba(0,0,0,0.3); }
-        
-        /* Tic Tac Toe */
+
+        /* The actual piece */
+        .c4-piece {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            position: absolute; top: 0; left: 0;
+            /* 3D Sphere effect */
+            box-shadow: 
+                inset -5px -5px 15px rgba(0,0,0,0.5),
+                inset 5px 5px 15px rgba(255,255,255,0.4),
+                0 5px 10px rgba(0,0,0,0.3);
+        }
+        /* Colors */
+        .c4-piece.red { background: radial-gradient(circle at 30% 30%, #ff8a80, var(--plastic-red)); border: 2px solid #b71c1c; }
+        .c4-piece.yellow { background: radial-gradient(circle at 30% 30%, #ffff8d, var(--plastic-yellow)); border: 2px solid #f57f17;}
+
+        /* Dropping Animation */
+        .c4-piece.dropping {
+            animation: dropIn 0.5s cubic-bezier(0.5, 0.05, 1, 0.5) forwards;
+        }
+
+        @keyframes dropIn {
+            from { transform: translateY(-400px); }
+            to { transform: translateY(0); }
+        }
+
+        /* --- GAME SPECIFIC: TIC TAC TOE (WOOD ON FELT STYLE) --- */
         .ttt-board {
             display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-gap: 10px;
+            grid-template-columns: repeat(3, 110px);
+            grid-gap: 15px;
+            /* Brass dividers embedded in felt */
+            background-color: var(--accent-brass);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.4);
+            border: 3px solid #8c7f32;
         }
+        
         .ttt-cell {
-            width: 100px; height: 100px;
-            background: rgba(255,255,255,0.1);
+            width: 110px; height: 110px;
+            /* Felt square */
+            background-color: var(--felt-green);
+            background-image: var(--felt-texture);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 4rem;
-            font-weight: bold;
+            font-size: 5rem;
+            font-family: var(--font-fancy);
             cursor: pointer;
-            border-radius: 10px;
-            transition: background 0.2s;
+            border-radius: 5px;
+            transition: all 0.2s;
         }
-        .ttt-cell:hover { background: rgba(255,255,255,0.2); }
-        .ttt-cell.x { color: #f48fb1; }
-        .ttt-cell.o { color: #81d4fa; }
+
+        .ttt-cell:hover {
+            background-color: #0d5c12; /* Slightly brighter green */
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
+        }
+
+        /* Wooden Pieces look */
+        .ttt-piece {
+            /* Carved wood effect text */
+            color: transparent;
+            background: linear-gradient(to bottom, #dcedc8, #aed581);
+            background-clip: text;
+            -webkit-background-clip: text;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
+            transform: scale(0); /* Start invisible for animation */
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .ttt-piece.o {
+             background: linear-gradient(to bottom, #ffccbc, #ffab91);
+             background-clip: text;
+             -webkit-background-clip: text;
+        }
+
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
 
     </style>
 </head>
@@ -209,9 +376,9 @@
 
     <div id="active-game-container">
         <div class="game-navbar">
-            <button class="btn btn-secondary" onclick="app.returnToHub()">← Back to Hub</button>
+            <button class="btn" onclick="app.returnToHub()">← Collection</button>
             <h2 id="current-game-title">Game Title</h2>
-            <button class="btn" onclick="app.resetCurrentGame()">Reset Game</button>
+            <button class="btn" onclick="app.resetCurrentGame()">Restart</button>
         </div>
         <div class="game-area">
             <div class="status-display" id="game-status">Player's Turn</div>
@@ -221,13 +388,15 @@
 
     <script>
         /**
-         * CLUBHOUSE ARCHITECT ENGINE
-         * Complex Modular System for Board Games
+         * CLUBHOUSE ARCHITECT ENGINE v2 (VISUAL DELUXE)
+         * The JS logic is largely the same, but rendering methods are updated
+         * to produce the more complex HTML structures needed for the new CSS.
          */
 
         // --- 1. CORE SYSTEM ---
         class GameEngine {
             constructor() {
+                // Using simpler emojis for icons, relying on CSS for the look
                 this.games = [
                     { id: 'c4', name: 'Connect Four', icon: '🔴', active: true, class: ConnectFour },
                     { id: 'ttt', name: 'Tic Tac Toe', icon: '❌', active: true, class: TicTacToe },
@@ -251,10 +420,11 @@
                 this.games.forEach(game => {
                     const card = document.createElement('div');
                     card.className = `game-card ${game.active ? '' : 'disabled'}`;
+                    // Using a span wrapper for the icon to apply specific CSS filters
                     card.innerHTML = `
-                        <div class="game-icon">${game.icon}</div>
+                        <span class="game-icon-wrapper">${game.icon}</span>
                         <div class="game-title">${game.name}</div>
-                        <div class="game-status">${game.active ? 'Play vs AI' : 'Coming Soon'}</div>
+                        <div class="game-status">${game.active ? 'Play vs AI' : 'On Shelf'}</div>
                     `;
                     card.onclick = () => {
                         if (game.active) this.launchGame(game);
@@ -264,21 +434,22 @@
             }
 
             launchGame(gameMeta) {
-                document.getElementById('game-hub').style.transform = 'scale(0.9) translateY(-20px)';
-                document.getElementById('game-hub').style.opacity = '0';
+                const hub = document.getElementById('game-hub');
+                // 3D hinge effect for menu leaving
+                hub.style.transform = 'perspective(1000px) rotateX(15deg) scale(0.9) translateY(50px)';
+                hub.style.opacity = '0';
                 
                 setTimeout(() => {
-                    document.getElementById('game-hub').style.display = 'none';
+                    hub.style.display = 'none';
                     const container = document.getElementById('active-game-container');
                     container.classList.add('visible');
                     document.getElementById('current-game-title').innerText = gameMeta.name;
                     
-                    // Instantiate the game class
                     this.currentGame = new gameMeta.class(
                         document.getElementById('game-board-container'),
                         document.getElementById('game-status')
                     );
-                }, 300);
+                }, 500);
             }
 
             returnToHub() {
@@ -286,14 +457,15 @@
                 container.classList.remove('visible');
                 
                 setTimeout(() => {
-                    document.getElementById('game-hub').style.display = 'flex';
+                    const hub = document.getElementById('game-hub');
+                    hub.style.display = 'flex';
                     // Trigger reflow
-                    void document.getElementById('game-hub').offsetWidth;
-                    document.getElementById('game-hub').style.transform = 'none';
-                    document.getElementById('game-hub').style.opacity = '1';
+                    void hub.offsetWidth;
+                    hub.style.transform = 'none';
+                    hub.style.opacity = '1';
                     this.currentGame = null;
                     document.getElementById('game-board-container').innerHTML = '';
-                }, 400);
+                }, 600);
             }
 
             resetCurrentGame() {
@@ -316,7 +488,8 @@
             }
 
             aiDelay(callback) {
-                setTimeout(callback, 700); // Simulate thinking time
+                // Slightly longer delay for dramatic effect in new visuals
+                setTimeout(callback, 1000); 
             }
         }
 
@@ -336,8 +509,11 @@
                 
                 this.board.forEach((cell, idx) => {
                     const cellEl = document.createElement('div');
-                    cellEl.className = `ttt-cell ${cell ? cell.toLowerCase() : ''}`;
-                    cellEl.innerText = cell || '';
+                    cellEl.className = `ttt-cell`;
+                    // If cell is occupied, add the piece span with animation class
+                    if(cell) {
+                         cellEl.innerHTML = `<span class="ttt-piece ${cell.toLowerCase()}">${cell}</span>`;
+                    }
                     cellEl.onclick = () => this.handleMove(idx);
                     boardEl.appendChild(cellEl);
                 });
@@ -347,6 +523,7 @@
                 if (this.board[idx] || !this.isPlayerTurn || this.gameOver) return;
                 
                 this.board[idx] = 'X';
+                // Rerender to show the X appear
                 this.render();
                 
                 if (this.checkWin('X')) {
@@ -367,7 +544,7 @@
 
             makeAIMove() {
                 if (this.gameOver) return;
-                // Minimax for perfect play
+                // Minimax logic remains the same
                 let bestScore = -Infinity;
                 let move;
                 for (let i = 0; i < 9; i++) {
@@ -440,20 +617,38 @@
                 this.board = Array(this.rows).fill().map(() => Array(this.cols).fill(null));
                 this.isPlayerTurn = true;
                 this.gameOver = false;
-                this.render();
+                this.renderBoardStructure();
                 this.updateStatus("Your Turn (Red)");
             }
 
-            render() {
-                this.container.innerHTML = '<div class="c4-board"></div>';
-                const boardEl = this.container.querySelector('.c4-board');
-                
+            // New rendering method: Creates the board frame once
+            renderBoardStructure() {
+                this.container.innerHTML = `
+                    <div class="c4-board-frame">
+                        <div class="c4-grid" id="c4-grid-slots"></div>
+                    </div>`;
+                this.gridEl = document.getElementById('c4-grid-slots');
+                this.renderCells();
+            }
+
+            // Renders individual cells and pieces
+            renderCells(lastMoveCoords = null) {
+                this.gridEl.innerHTML = '';
                 for (let r = 0; r < this.rows; r++) {
                     for (let c = 0; c < this.cols; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = `c4-cell ${this.board[r][c] || ''}`;
-                        cell.onclick = () => this.handleMove(c);
-                        boardEl.appendChild(cell);
+                        const cellMask = document.createElement('div');
+                        cellMask.className = 'c4-cell-mask';
+                        cellMask.onclick = () => this.handleMove(c);
+
+                        const color = this.board[r][c];
+                        if (color) {
+                            const piece = document.createElement('div');
+                            // Add 'dropping' class only if this was the last move made
+                            const isLastMove = lastMoveCoords && lastMoveCoords.r === r && lastMoveCoords.c === c;
+                            piece.className = `c4-piece ${color} ${isLastMove ? 'dropping' : ''}`;
+                            cellMask.appendChild(piece);
+                        }
+                        this.gridEl.appendChild(cellMask);
                     }
                 }
             }
@@ -461,7 +656,6 @@
             handleMove(col) {
                 if (!this.isPlayerTurn || this.gameOver) return;
                 
-                // Find lowest empty row in col
                 let row = -1;
                 for (let r = this.rows - 1; r >= 0; r--) {
                     if (!this.board[r][col]) {
@@ -470,7 +664,7 @@
                     }
                 }
                 
-                if (row === -1) return; // Column full
+                if (row === -1) return; 
 
                 this.dropPiece(row, col, 'red');
                 
@@ -487,14 +681,13 @@
 
             dropPiece(r, c, color) {
                 this.board[r][c] = color;
-                this.render();
+                // Pass coordinates so render knows which piece to animate
+                this.renderCells({r, c}); 
             }
 
             makeAIMove() {
                 if (this.gameOver) return;
-
-                // Simple AI: Try to win, block opponent, or random
-                // 1. Check for winning move
+                // Same AI Logic as before
                 let move = this.findBestMove('yellow') || this.findBestMove('red') || this.getRandomMove();
 
                 if (move !== null) {
@@ -514,17 +707,15 @@
             }
 
             findBestMove(color) {
-                // Simulate dropping piece in each column to see if it wins/blocks
                 for (let c = 0; c < this.cols; c++) {
-                    if (this.board[0][c]) continue; // Column full
+                    if (this.board[0][c]) continue;
                     let r = -1;
                     for (let i = this.rows - 1; i >= 0; i--) {
                         if (!this.board[i][c]) { r = i; break; }
                     }
-                    
                     this.board[r][c] = color;
                     let win = this.checkWin(r, c, color);
-                    this.board[r][c] = null; // Backtrack
+                    this.board[r][c] = null;
                     if (win) return c;
                 }
                 return null;
@@ -537,22 +728,14 @@
             }
 
             checkWin(r, c, color) {
-                const directions = [
-                    [0, 1], // horizontal
-                    [1, 0], // vertical
-                    [1, 1], // diagonal right
-                    [1, -1] // diagonal left
-                ];
-
+                const directions = [[0, 1],[1, 0],[1, 1],[1, -1]];
                 return directions.some(([dr, dc]) => {
                     let count = 1;
-                    // Positive direction
                     for (let i = 1; i < 4; i++) {
                         const nr = r + dr * i, nc = c + dc * i;
                         if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && this.board[nr][nc] === color) count++;
                         else break;
                     }
-                    // Negative direction
                     for (let i = 1; i < 4; i++) {
                         const nr = r - dr * i, nc = c - dc * i;
                         if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && this.board[nr][nc] === color) count++;
